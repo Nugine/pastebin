@@ -1,0 +1,26 @@
+@import "./assets/fonts/FiraCode/fira_code.css";
+
+.full-screen {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+body,
+#root {
+    width: 100%;
+    min-height: 100vh;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
+option {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
