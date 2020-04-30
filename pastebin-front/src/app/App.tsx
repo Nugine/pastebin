@@ -1,4 +1,3 @@
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import React from "react";
@@ -7,8 +6,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import Show from "./show/Show";
 
 import Container from "react-bootstrap/Container";
-import Col from "react-bootstrap/Col";
-
+import { PROJECT_NAME } from "../data";
 
 const App: React.FC = () => {
     const router = (
@@ -22,15 +20,43 @@ const App: React.FC = () => {
         </Router>
     );
 
+    const nowYear = new Date().getFullYear();
+
+    const authorLink = (
+        <a href="https://github.com/Nugine" target="_blank" rel="noopener noreferrer">
+            Nugine
+        </a>
+    );
+
+    const repoLink = (
+        <a href="        https://github.com/Nugine/pastebin
+        " target="_blank" rel="noopener noreferrer">
+            <img
+                alt="GitHub stars"
+                src="https://img.shields.io/github/stars/Nugine/pastebin?style=social"
+            />
+        </a>
+    );
+
+    const footer = (
+        <footer style={{ marginBottom: "1rem", textAlign: "center" }}>
+            <span>© {nowYear > 2019 ? `2019 - ${nowYear}` : "2019"} {authorLink}. </span>
+            <span>{repoLink}</span>
+        </footer>
+    );
+
     return (
-        <Container className="full-screen">
-            <Col xs={12} sm={12} md={10} className="full-screen">
-                <div style={{ minHeight: "calc(100vh - 7rem)", width: "100%" }}>
-                    {router}
-                </div>
-            </Col>
+        <Container fluid="lg" style={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
+        }}>
+            {router}
+            {footer}
         </Container>
     );
+
 };
 
 export default App;

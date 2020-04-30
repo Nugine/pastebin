@@ -1,20 +1,28 @@
 import React, { useState } from "react";
 
 import Button from "react-bootstrap/Button";
+import { PROJECT_NAME } from "../../data";
 
 interface EditorBarProps {
-    onEdit: () => void
+    onEdit: () => void,
     onCopy: () => boolean,
     onPreview: () => void,
-    onPaste: () => void
+    onPaste: () => void,
+    isEditing: boolean,
 }
 
 const EditorBar: React.FC<EditorBarProps> = (props: EditorBarProps) => {
-    const { onEdit, onCopy, onPreview, onPaste } = props;
+    const { onEdit, onCopy, onPreview, onPaste, isEditing } = props;
 
     const editBtn = (
-        <Button variant="outline-light" onClick={onEdit}>
+        <Button variant="outline-light" onClick={onEdit} className="bar-item">
             Edit
+        </Button>
+    );
+
+    const previewBtn = (
+        <Button variant="outline-light" onClick={onPreview} className="bar-item">
+            Preview
         </Button>
     );
 
@@ -29,26 +37,21 @@ const EditorBar: React.FC<EditorBarProps> = (props: EditorBarProps) => {
     const matchVariant = () => (copyState !== null ? copyState ? "success" : "danger" : "outline-light");
 
     const copyBtn = (
-        <Button variant={matchVariant()} onClick={handleCopy}>
+        <Button variant={matchVariant()} onClick={handleCopy} className="bar-item">
             Copy
         </Button>
     );
 
-    const previewBtn = (
-        <Button variant="outline-light" onClick={onPreview}>
-            Preview
-        </Button>
-    );
-
     const pasteBtn = (
-        <Button variant="outline-light" onClick={onPaste}>
+        <Button variant="outline-light" onClick={onPaste} className="bar-item">
             Paste !
         </Button>
     );
 
     return (
         <div className="bar-container">
-            <div>{editBtn}{copyBtn}</div><div>{previewBtn}{pasteBtn}</div>
+            {editBtn}{previewBtn}
+            {copyBtn}{pasteBtn}
         </div>
     );
 };

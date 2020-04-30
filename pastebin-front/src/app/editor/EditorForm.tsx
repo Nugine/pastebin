@@ -26,7 +26,6 @@ const EditorForm: React.FC<Props> = ({ hidden }: Props) => {
             const now = cvt(e.currentTarget.value);
             if (prev !== now) {
                 record[key] = now;
-                console.log(record);
             }
         };
     }
@@ -40,6 +39,7 @@ const EditorForm: React.FC<Props> = ({ hidden }: Props) => {
                 type="text"
                 defaultValue={record.title}
                 onChange={syncField("title", (s) => (s))}
+                className="code-area"
             >
             </Form.Control>
         </Form.Group>
@@ -94,6 +94,14 @@ const EditorForm: React.FC<Props> = ({ hidden }: Props) => {
     const contentTextAreaRef = useRef<HTMLTextAreaElement>(null);
     useEffect(() => contentTextAreaRef.current?.focus());
 
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.keyCode === "\t".charCodeAt(0)) {
+            console.log(e);
+            e.preventDefault();
+        }
+    };
+
     const contentTextArea = (
         <div className={isValid === false ? "was-validated" : undefined}>
             <Form.Group>
@@ -113,6 +121,7 @@ const EditorForm: React.FC<Props> = ({ hidden }: Props) => {
                     required
                     ref={contentTextAreaRef}
                     className="code-area"
+                    onKeyDown={handleKeyDown}
                 >
                 </Form.Control>
                 <Form.Control.Feedback type='invalid'>This field is required.</Form.Control.Feedback>
@@ -129,7 +138,11 @@ const EditorForm: React.FC<Props> = ({ hidden }: Props) => {
         <Form
             onSubmit={handleSubmit}
             autoComplete="off"
-            style={hidden ? { display: "none" } : undefined}
+            style={{
+                display: hidden ? "none" : undefined,
+                width: "100%",
+                flexGrow: 1,
+            }}
         >
             {titleInput}
             {langSelect}

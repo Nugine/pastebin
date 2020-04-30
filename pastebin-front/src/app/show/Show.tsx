@@ -9,30 +9,53 @@ import copy from "copy-to-clipboard";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import qrcode from "qrcode";
-import { PROJECT_NAME } from "../../data";
+import { PROJECT_NAME, PastebinRecord } from "../../data";
+import { findExt } from "../../data/lang";
+import Container from "react-bootstrap/Container";
+
+// only for PROJECT_NAME
+const toKebabCase = (s: string) => s.split(" ").map((p) => p.toLowerCase()).join("-");
+
+const downloadFile = (record: PastebinRecord, key: string) => {
+    const fileExt = findExt(record.lang);
+    const isValid = record.title !== "" && record.title.split("").reduce(
+        (acc, x) => (
+            acc && "~`!@#$%^&*()-+={}[]|:;\"'<>,.?/\b\f\n\r\t\v\\\0".indexOf(x) !== -1
+        ), true);
+    const fileName = isValid ? (record.title) : (`${toKebabCase(PROJECT_NAME)}-${key}`);
+    const a = document.createElement("a");
+    a.download = `${fileName}${fileExt}`;
+    a.href = URL.createObjectURL(new Blob([record.content]));
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
 
 const Show: React.FC = () => {
     const record = useContext(RecordContext);
 
     const { key } = useParams<{ key: string }>();
-    const [isLoading, setIsLoading] = useState(true);
+    const [fetchState, setFetchState] = useState<boolean | null>(null);
     const [enableQRModal, setEnableQRModal] = useState(false);
 
     const history = useHistory();
 
-    const load = async () => {
-        try {
-            const res = await api.findRecord(key);
-            Object.assign(record, res);
-            setIsLoading(false);
-        } catch (err) {
-            history.push("/");
-        }
-    };
-
     useEffect(() => {
-        load();
-    });
+        if (fetchState === null) {
+            (async () => {
+                try {
+                    console.log("load");
+                    const res = await api.findRecord(key);
+                    Object.assign(record, res);
+                    setFetchState(true);
+                } catch (err) {
+                    setFetchState(false);
+                    history.push("/");
+                }
+            })();
+        }
+    }, [fetchState, history, key, record]);
 
     const title = record.title ? `${record.title} - ${PROJECT_NAME}` : PROJECT_NAME;
 
@@ -44,17 +67,23 @@ const Show: React.FC = () => {
     const handleEdit = () => history.push("/");
     const handleCopy = () => copy(record.content);
     const handleQRCode = () => setEnableQRModal(true);
+    const handleDownload = () => downloadFile(record, key);
 
     const showBar = (
         <ShowBar
             onEdit={handleEdit}
             onCopy={handleCopy}
             onQRCode={handleQRCode}
+            onDownload={handleDownload}
         />
     );
 
     const view = (
-        <View lang={record.lang} content={record.content}></View>
+        <View
+            title={record.title !== "" ? record.title : undefined}
+            lang={record.lang}
+            content={record.content}
+        />
     );
 
     const [dataUrl, setDataUrl] = useState<string | null>(null);
@@ -93,14 +122,17 @@ const Show: React.FC = () => {
         </Modal>
     );
 
+
+
     const show = (
-        <div>
+        <>
             {showBar}
             {view}
             {qrModal}
-        </div>
+        </>
     );
-    return isLoading ? null : show;
+
+    return fetchState === null ? null : show;
 };
 
 export default Show;

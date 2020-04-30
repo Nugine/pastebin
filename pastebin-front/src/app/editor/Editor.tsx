@@ -7,6 +7,8 @@ import { useHistory } from "react-router-dom";
 import EditorBar from "./EditorBar";
 import EditorForm from "./EditorForm";
 import View from "../show/View";
+import Container from "react-bootstrap/Container";
+import { PROJECT_NAME } from "../../data";
 
 const Editor: React.FC = () => {
     const record = useContext(RecordContext);
@@ -23,6 +25,7 @@ const Editor: React.FC = () => {
         if (isEditing) {
             if (isValid) {
                 setIsEditing(false);
+                console.log(record);
             } else {
                 setIsValid(record.content !== "");
             }
@@ -45,6 +48,7 @@ const Editor: React.FC = () => {
 
     const editorBar = (
         <EditorBar
+            isEditing={isEditing}
             onEdit={handleEdit}
             onCopy={handleCopy}
             onPreview={handlePreview}
@@ -56,8 +60,13 @@ const Editor: React.FC = () => {
         <EditorForm hidden={!isEditing}></EditorForm>
     );
 
-    const editorView = (
-        <View hidden={isEditing} lang={record.lang} content={record.content} />
+    const editorView = isEditing ? null : (
+        <View
+            hidden={isEditing}
+            title={record.title !== "" ? record.title : undefined}
+            lang={record.lang}
+            content={record.content}
+        />
     );
 
     return (
@@ -67,11 +76,9 @@ const Editor: React.FC = () => {
                 updateIsValid: (v) => setIsValid(v)
             }}
         >
-            <div>
-                {editorBar}
-                {editorForm}
-                {editorView}
-            </div>
+            {editorBar}
+            {editorForm}
+            {editorView}
         </EditorContext.Provider>
     );
 };

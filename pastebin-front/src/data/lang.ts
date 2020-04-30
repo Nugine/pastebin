@@ -15,3 +15,8 @@ langArray.push({
 export function getLangArray(): Lang[] {
     return langArray;
 }
+
+export function findExt(lang: string): string | null {
+    return ".md";
+    // throw new Error("unimplemented"); // TODO
+}
