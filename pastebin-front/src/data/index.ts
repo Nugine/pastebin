@@ -30,6 +30,7 @@ export interface ErrorRes {
 export interface Lang {
     value: string;
     display: string;
+    ext: string;
 }
 
 export interface Expiration {

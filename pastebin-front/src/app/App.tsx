@@ -6,7 +6,6 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import Show from "./show/Show";
 
 import Container from "react-bootstrap/Container";
-import { PROJECT_NAME } from "../data";
 
 const App: React.FC = () => {
     const router = (

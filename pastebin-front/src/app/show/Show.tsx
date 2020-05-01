@@ -11,13 +11,12 @@ import Button from "react-bootstrap/Button";
 import qrcode from "qrcode";
 import { PROJECT_NAME, PastebinRecord } from "../../data";
 import { findExt } from "../../data/lang";
-import Container from "react-bootstrap/Container";
 
 // only for PROJECT_NAME
 const toKebabCase = (s: string) => s.split(" ").map((p) => p.toLowerCase()).join("-");
 
 const downloadFile = (record: PastebinRecord, key: string) => {
-    const fileExt = findExt(record.lang);
+    const fileExt = findExt(record.lang) ?? ".txt";
     const isValid = record.title !== "" && record.title.split("").reduce(
         (acc, x) => (
             acc && "~`!@#$%^&*()-+={}[]|:;\"'<>,.?/\b\f\n\r\t\v\\\0".indexOf(x) !== -1
@@ -45,7 +44,6 @@ const Show: React.FC = () => {
         if (fetchState === null) {
             (async () => {
                 try {
-                    console.log("load");
                     const res = await api.findRecord(key);
                     Object.assign(record, res);
                     setFetchState(true);

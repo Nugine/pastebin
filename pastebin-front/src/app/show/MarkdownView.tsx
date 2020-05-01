@@ -1,19 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import MarkdownIt from "markdown-it";
-import Prism from "./prism";
-
-let md: MarkdownIt | null = null;
-
-const getMd: () => MarkdownIt = () => {
-    if (md === null) {
-        md = new MarkdownIt();
-    }
-    return md;
-};
-
-const render: (content: string) => (string) = (content) => {
-    return getMd().render(content);
-};
+import prism from "./prism";
+import { options as katexOptions } from "./katex";
+import markdown from "./markdown";
+import renderMathInElement from "katex/dist/contrib/auto-render";
 
 interface Props {
     content: string
@@ -25,14 +14,16 @@ const MarkdownView: React.FC<Props> = ({ content }: Props) => {
     const divRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setInner(render(content));
-        console.log("markdown view effect");
-        console.log(Prism);
+        setInner(markdown.render(content));
         setImmediate(() => {
-            console.log("ready to highlight");
-            console.log("div: ", divRef.current);
             if (divRef.current) {
-                Prism.highlightAllUnder(divRef.current!, false, (e) => console.log("highlight: completed", e));
+                prism.highlightAllUnder(divRef.current!, false);
+            }
+        });
+
+        setImmediate(() => {
+            if (divRef.current) {
+                renderMathInElement(divRef.current, katexOptions);
             }
         });
     }, [content]);
@@ -41,6 +32,7 @@ const MarkdownView: React.FC<Props> = ({ content }: Props) => {
     return (
         <div
             ref={divRef}
+            style={{ width: "100%" }}
             dangerouslySetInnerHTML={{ __html: inner }}
         />
     );

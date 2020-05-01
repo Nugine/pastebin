@@ -1,5 +1,6 @@
-import Prism from "prismjs";
-import "prismjs/plugins/line-numbers/prism-line-numbers";
-import "prismjs/plugins/line-numbers/prism-line-numbers.css";
+// custom bundle
+
+import Prism from "../../assets/js/prismjs/prism.js";
+import "../../assets/js/prismjs/prism.css";
 
 export default Prism;

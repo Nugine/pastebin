@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import { RecordContext } from "../context";
 
 import "./ShowBar.css";
-import Container from "react-bootstrap/Container";
 
 interface ShowBarProps {
     onEdit: () => void

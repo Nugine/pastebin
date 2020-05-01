@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 
 import Button from "react-bootstrap/Button";
-import { PROJECT_NAME } from "../../data";
 
 interface EditorBarProps {
     onEdit: () => void,
     onCopy: () => boolean,
     onPreview: () => void,
     onPaste: () => void,
-    isEditing: boolean,
 }
 
 const EditorBar: React.FC<EditorBarProps> = (props: EditorBarProps) => {
-    const { onEdit, onCopy, onPreview, onPaste, isEditing } = props;
+    const { onEdit, onCopy, onPreview, onPaste } = props;
 
     const editBtn = (
         <Button variant="outline-light" onClick={onEdit} className="bar-item">

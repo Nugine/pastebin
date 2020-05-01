@@ -7,8 +7,6 @@ import { useHistory } from "react-router-dom";
 import EditorBar from "./EditorBar";
 import EditorForm from "./EditorForm";
 import View from "../show/View";
-import Container from "react-bootstrap/Container";
-import { PROJECT_NAME } from "../../data";
 
 const Editor: React.FC = () => {
     const record = useContext(RecordContext);
@@ -25,7 +23,6 @@ const Editor: React.FC = () => {
         if (isEditing) {
             if (isValid) {
                 setIsEditing(false);
-                console.log(record);
             } else {
                 setIsValid(record.content !== "");
             }
@@ -36,7 +33,6 @@ const Editor: React.FC = () => {
 
     const handlePaste = async () => {
         if (!isValid) { setIsValid(false); return; }
-        console.log(record);
         try {
             const res = await api.saveRecord(record);
             history.push(`/${res.key}/`);
@@ -48,7 +44,6 @@ const Editor: React.FC = () => {
 
     const editorBar = (
         <EditorBar
-            isEditing={isEditing}
             onEdit={handleEdit}
             onCopy={handleCopy}
             onPreview={handlePreview}
