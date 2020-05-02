@@ -85,7 +85,7 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
         let config = req.inject_ref::<Config>().unwrap();
 
         log::info!(
-            "FIND key = {0}, url = http://{1}/records/{0} , cache_hit = {2}, view_count = {3}",
+            "FIND key = {0}, url = http://{1}/{0} , cache_hit = {2}, view_count = {3}",
             key,
             config.server.hostname,
             cache_hit,
@@ -165,7 +165,7 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
         let config = req.inject_ref::<Config>().unwrap();
 
         log::info!(
-            "SAVE key = {0}, url = http://{1}/records/{0}",
+            "SAVE key = {0}, url = http://{1}/{0}",
             key,
             config.server.hostname
         );
