@@ -2,23 +2,19 @@ use crate::cache::RecordCache;
 use crate::config::Config;
 use crate::crypto::Key;
 use crate::error::RecordError;
-use crate::record::{FindRecordRes, Record, RecordJson, SaveRecordReq, SaveRecordRes};
+use crate::record_types::{FindRecordRes, Record, RecordJson, SaveRecordReq, SaveRecordRes};
 use crate::repo::RecordRepo;
-use nuclear::{
-    re_exports::http::StatusCode,
-    web::{
-        self,
-        parser::{json::JsonExt as _, BodyError},
-    },
-    Request, Response, WebResult,
-};
+use nuclear::re_exports::http::StatusCode;
+use nuclear::web::parser::{json::JsonExt as _, BodyError};
+use nuclear::{web, Request, Response, WebResult};
 use short_crypt::ShortCrypt;
 use std::sync::Arc;
 
+// require: Config
 // require: ShortCrypt
 // require: RecordRepo
 // require: RecordCache
-// pattern: "/record/:key"
+// pattern: "/records/:key"
 pub async fn find_record(req: Request) -> WebResult<Response> {
     let key = {
         let key = req.get_param("key").unwrap();
@@ -73,7 +69,7 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
 
     let res: FindRecordRes = {
         let record = serde_json::from_str::<Record>(&*record_json.0).map_err(log_json_err)?;
-        FindRecordRes::from((record, view_count))
+        FindRecordRes::new(record, view_count)
     };
 
     {
@@ -81,7 +77,7 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
             key.clone(),
             Arc::clone(&record_json),
             res.view_count,
-            res.saving_time_seconds + res.expiration_seconds,
+            (res.saving_time_seconds as u64) + (res.expiration_seconds as u64),
         );
     }
 
@@ -89,7 +85,7 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
         let config = req.inject_ref::<Config>().unwrap();
 
         log::info!(
-            "FIND key = {0}, url = http://{1}/record/{0} , cache_hit = {2}, view_count = {3}",
+            "FIND key = {0}, url = http://{1}/records/{0} , cache_hit = {2}, view_count = {3}",
             key,
             config.server.hostname,
             cache_hit,
@@ -100,13 +96,12 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
     web::reply::json(&res).map_err(log_json_err)?.into_result()
 }
 
-// require: TokenBucket
+// require: Config
 // require: ShortCrypt
 // require: RecordRepo
 // require: RecordCache
-// pattern: "/record"
+// pattern: "/records"
 pub async fn save_record(mut req: Request) -> WebResult<Response> {
-
     let save_req: SaveRecordReq = {
         let config = req.inject_ref::<Config>().unwrap();
         let mut json_parser = web::parser::json::JsonParser::default();
@@ -137,7 +132,7 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
         title: save_req.title,
         lang: save_req.lang,
         content: save_req.content,
-        saving_time_seconds: crate::util::now(),
+        saving_time_seconds: crate::util::now() as u32,
         expiration_seconds: save_req.expiration_seconds,
     };
 
@@ -156,7 +151,7 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
 
     {
         let cache = req.inject_ref::<RecordCache>().unwrap();
-        let dead_time = record.saving_time_seconds + record.expiration_seconds;
+        let dead_time = (record.saving_time_seconds as u64)+ (record.expiration_seconds as u64);
         if cache.is_updating() {
             cache.send_update(key.clone(), record_json, 0, dead_time);
         } else {
@@ -170,7 +165,7 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
         let config = req.inject_ref::<Config>().unwrap();
 
         log::info!(
-            "SAVE key = {0}, url = http://{1}/record/{0}",
+            "SAVE key = {0}, url = http://{1}/records/{0}",
             key,
             config.server.hostname
         );

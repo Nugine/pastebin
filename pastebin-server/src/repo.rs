@@ -1,6 +1,6 @@
 use crate::crypto::Key;
 use crate::error::RecordError;
-use crate::record::RecordJson;
+use crate::record_types::RecordJson;
 use mobc_redis::{
     redis::{self, AsyncCommands},
     Connection, RedisConnectionManager,
@@ -52,7 +52,7 @@ impl RecordRepo {
         &'s self,
         key_gen: impl Fn() -> Key,
         json: &RecordJson,
-        expiration_seconds: u64,
+        expiration_seconds: u32,
     ) -> Result<Key, RecordError> {
         let mut conn = self.get_conn().await?;
 

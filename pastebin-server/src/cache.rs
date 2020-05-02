@@ -1,5 +1,5 @@
 use crate::crypto::Key;
-use crate::record::RecordJson;
+use crate::record_types::RecordJson;
 use crate::repo::RecordRepo;
 use rand::Rng;
 use std::collections::HashMap;
@@ -121,9 +121,28 @@ impl RecordCache {
             let repo = Arc::clone(&repo);
             tokio::spawn(async move {
                 for (key, delta) in to_update {
-                    if let Ok(Some(count)) = repo.incr_view(&key, delta).await {
-                        log::info!("incr_view: key = {}, view_count = {}", key, count);
-                    }
+                    let ret = repo.incr_view(&key, delta).await;
+                    match ret {
+                        Ok(Some(count)) => {
+                            log::info!(
+                                "incr_view: key = {}, delta = {}, view_count = {}",
+                                key,
+                                delta,
+                                count
+                            );
+                        }
+                        Ok(None) => {
+                            log::info!("incr_view: key = {}, delta = {}, not exists", key, delta);
+                        }
+                        Err(e) => {
+                            log::error!(
+                                "incr_view: key = {}, delta = {}, error = {}",
+                                key,
+                                delta,
+                                e
+                            );
+                        }
+                    };
                 }
             });
         }
@@ -135,6 +154,10 @@ impl RecordCache {
         duration: Duration,
         cache_capacity: usize,
     ) {
+        if self.update_tx.is_some() {
+            log::warn!("spawn_updater has already been called on this cache");
+        }
+
         let (tx, rx) = mpsc::unbounded_channel();
         self.update_tx = Some(tx);
         let cache = Arc::clone(&self.cache);
@@ -217,7 +240,7 @@ impl Provider for RecordCacheProvider {
         if let Some(mc) = config.memory_cache.as_ref() {
             record_cache.spawn_updater(
                 repo,
-                Duration::from_secs(mc.update_duration_seconds),
+                Duration::from_secs(mc.update_duration_seconds as u64),
                 mc.capacity,
             );
         }

@@ -3,7 +3,7 @@ use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MemoryCache {
-    pub update_duration_seconds: u64,
+    pub update_duration_seconds: u32,
     pub capacity: usize,
 }
 
@@ -16,8 +16,8 @@ pub struct Redis {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Limiter {
-    pub find_qps: u64,
-    pub save_qps: u64,
+    pub find_qps: u32,
+    pub save_qps: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,7 +30,7 @@ pub struct Server {
 pub struct Security {
     pub crypto_key: String,
     pub max_post_size: usize,
-    pub max_expiration_seconds: u64,
+    pub max_expiration_seconds: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

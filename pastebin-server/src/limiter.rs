@@ -83,6 +83,10 @@ impl TokenBucket {
     }
 
     pub fn spawn_daemon(&mut self) {
+        if self.kill_tx.is_some(){
+            log::warn!("spawn_daemon has already been called on this limiter")
+        }
+
         let (tx, rx) = oneshot::channel();
         self.kill_tx = Some(tx);
         tokio::spawn(Self::daemon(

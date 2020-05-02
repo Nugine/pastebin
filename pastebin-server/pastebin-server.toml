@@ -5,7 +5,7 @@ hostname = "localhost:3000"
 [security]
 crypto_key = "magic"
 max_post_size = 65536 # 64 KiB
-max_expiration_seconds = 2592000 # 30 days
+max_expiration_seconds = 2592123 # 30 days
 
 [redis]
 url = "redis://localhost:6379"
@@ -17,5 +17,5 @@ update_duration_seconds = 1
 capacity = 256
 
 [limiter]
-find_qps = 600
+find_qps = 150000
 save_qps = 100

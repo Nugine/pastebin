@@ -48,7 +48,7 @@ impl WebError for RecordError {
             message: self.to_string(),
         };
 
-        let mut res = web::reply::json(&res).unwrap();
+        let mut res = web::reply::json(&res).unwrap(); // FIXME: here can not panic?
         *res.status_mut() = status;
         res.into_result()
     }
