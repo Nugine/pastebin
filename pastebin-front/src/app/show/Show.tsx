@@ -100,7 +100,7 @@ const Show: React.FC = () => {
                 alignItems: "baseline"
             }}>
                 <Modal.Title>
-                    {title}
+                    {record.title !== "" ? record.title : PROJECT_NAME}
                 </Modal.Title>
                 <Button
                     variant="outline-light"
