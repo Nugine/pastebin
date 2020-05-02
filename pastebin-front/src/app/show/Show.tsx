@@ -19,9 +19,10 @@ const downloadFile = (record: PastebinRecord, key: string) => {
     const fileExt = findExt(record.lang) ?? ".txt";
     const isValid = record.title !== "" && record.title.split("").reduce(
         (acc, x) => (
-            acc && "~`!@#$%^&*()-+={}[]|:;\"'<>,.?/\b\f\n\r\t\v\\\0".indexOf(x) !== -1
+            acc && ("~`!@#$%^&*()-+={}[]|:;\"'<>,.?/\b\f\n\r\t\v\\\0".indexOf(x) === -1)
         ), true);
     const fileName = isValid ? (record.title) : (`${toKebabCase(PROJECT_NAME)}-${key}`);
+    console.log(record, isValid, fileName, fileExt);
     const a = document.createElement("a");
     a.download = `${fileName}${fileExt}`;
     a.href = URL.createObjectURL(new Blob([record.content]));
@@ -48,6 +49,7 @@ const Show: React.FC = () => {
                     Object.assign(record, res);
                     setFetchState(true);
                 } catch (err) {
+                    console.error(err);
                     setFetchState(false);
                     history.push("/");
                 }
@@ -130,7 +132,7 @@ const Show: React.FC = () => {
         </>
     );
 
-    return fetchState === null ? null : show;
+    return show;
 };
 
 export default Show;

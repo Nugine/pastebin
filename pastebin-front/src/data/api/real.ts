@@ -8,13 +8,14 @@ export async function saveRecord(
 ): Promise<SaveRecordRes> {
     const url = "/api/records";
     const res = await fetch(url, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
     });
     if (res.ok) {
-        return res.json();
+        return await res.json();
     } else {
-        throw res.json();
+        throw await res.json();
     }
 }
 
@@ -25,8 +26,8 @@ export async function findRecord(key: Key): Promise<FindRecordRes> {
     const url = `/api/records/${key}`;
     const res = await fetch(url);
     if (res.ok) {
-        return res.json();
+        return await res.json();
     } else {
-        throw res.json();
+        throw await res.json();
     }
 }

@@ -38,7 +38,7 @@ const Editor: React.FC = () => {
             history.push(`/${res.key}/`);
         } catch (err) {
             console.error(err);
-            setImmediate(() => alert("failed"));
+            setImmediate(() => alert(`Failed: ${err?.message}`));
         }
     };
 
