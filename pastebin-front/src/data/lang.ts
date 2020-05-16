@@ -20,7 +20,7 @@ const others: Array<Array<string>> = [
     ["javascript", "JavaScript", ".js"],
     ["bash", "Bash", ".sh"],
     ["c", "C", ".c"],
-    ["cpp", "CPP", ".cpp"],
+    ["cpp", "C++", ".cpp"],
     ["cs", "C#", ".cs"],
     ["erlang", "Erlang", ".erl"],
     ["go", "Go", ".go"],

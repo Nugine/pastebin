@@ -26,7 +26,7 @@ expirationArray.push({
 
 
 expirationArray.push({
-    value: 3600 * 24 * 7 * 30,
+    value: 3600 * 24 * 30,
     display: "one month",
 });
 
