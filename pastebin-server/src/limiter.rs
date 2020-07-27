@@ -1,12 +1,10 @@
-use nuclear::re_exports::{async_trait, http::StatusCode};
-use nuclear::{Endpoint, Middleware, Next, Request, Response, WebResult};
+use nuclear::core::{Endpoint, Middleware, Next, Request, Response, Result};
+use nuclear::{core::async_trait, http::StatusCode};
 use std::sync::atomic::{self, AtomicU64};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::oneshot;
 use tokio::time::interval;
-
-type BoxStdError = Box<dyn std::error::Error + Send + Sync>;
 
 pub struct TokenBucket {
     current_tokens: Arc<AtomicU64>,
@@ -20,8 +18,8 @@ pub struct TokenBucket {
 }
 
 pub async fn create503(_: Request) -> Response {
-    let mut res = Response::new(StatusCode::SERVICE_UNAVAILABLE);
-    res.body_str("503 Service temporarily unavailable");
+    let mut res = Response::new("503 Service temporarily unavailable");
+    res.set_status(StatusCode::SERVICE_UNAVAILABLE);
     res
 }
 
@@ -83,7 +81,7 @@ impl TokenBucket {
     }
 
     pub fn spawn_daemon(&mut self) {
-        if self.kill_tx.is_some(){
+        if self.kill_tx.is_some() {
             log::warn!("spawn_daemon has already been called on this limiter")
         }
 
@@ -109,15 +107,10 @@ impl Drop for TokenBucket {
 
 #[async_trait]
 impl Middleware for TokenBucket {
-    async fn call(&'_ self, req: Request, next: Next<'_>) -> WebResult<Response> {
+    async fn call(&'_ self, req: Request, next: Next<'_>) -> Result<Response> {
         match self.consume() {
             Some(()) => next.call(req).await,
             None => self.on_limit.call(req).await,
         }
-    }
-
-    async fn start(&mut self) -> Result<(), BoxStdError> {
-        self.spawn_daemon();
-        Ok(())
     }
 }

@@ -1,4 +1,8 @@
-use nuclear::{re_exports::http::StatusCode, web, Response, WebError};
+use nuclear::{
+    core::{Responder, Response, Result},
+    http::StatusCode,
+    web,
+};
 use serde::{Deserialize, Serialize};
 
 #[repr(u16)]
@@ -29,13 +33,11 @@ pub struct ErrorRes {
     pub message: String,
 }
 
-impl WebError for RecordError {
-    fn try_into_response(
-        self: Box<Self>,
-    ) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
+impl RecordError {
+    pub fn try_response(self: Self) -> Result<Response> {
         use RecordError::*;
 
-        let status: StatusCode = match *self {
+        let status: StatusCode = match self {
             BadKey => StatusCode::BAD_REQUEST,
             TooLongExpirations => StatusCode::BAD_REQUEST,
             TooLongContent => StatusCode::BAD_REQUEST,
@@ -44,12 +46,12 @@ impl WebError for RecordError {
         };
 
         let res: ErrorRes = ErrorRes {
-            code: *self as _,
+            code: self as _,
             message: self.to_string(),
         };
 
-        let mut res = web::reply::json(&res).unwrap(); // FIXME: here can not panic?
-        *res.status_mut() = status;
-        res.into_result()
+        let mut res = web::reply::json(res).try_response()?;
+        res.set_status(status);
+        Ok(res)
     }
 }

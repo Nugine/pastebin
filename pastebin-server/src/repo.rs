@@ -1,6 +1,7 @@
 use crate::crypto::Key;
+use crate::dto::RecordJson;
 use crate::error::RecordError;
-use crate::record_types::RecordJson;
+
 use mobc_redis::{
     redis::{self, AsyncCommands},
     Connection, RedisConnectionManager,
@@ -127,27 +128,26 @@ impl RecordRepo {
     }
 }
 
-use nuclear::re_exports::async_trait;
-use nuclear::{Injector, Provider, ProviderOutput};
-
-pub struct RecordRepoProvider;
+use crate::config::Config;
+use nuclear::core::async_trait;
+use nuclear::core::{Injector, Instance, Result};
 
 #[async_trait]
-impl Provider for RecordRepoProvider {
-    async fn resolve(&self, injector: &mut Injector) -> ProviderOutput {
-        let config = injector.inject_ref::<crate::config::Config>()?;
+impl Instance for RecordRepo {
+    async fn resolve(injector: &Injector) -> Result<Self> {
+        let config = injector.try_inject_ref::<Config>()?;
         let redis = &config.redis;
         let ret = RecordRepo::new(&redis.url, &redis.key_prefix, redis.max_open_connections);
 
         match ret {
-            Ok(repo) => {
-                injector.provide(repo);
-                Some(Ok(()))
-            }
+            Ok(repo) => Ok(repo),
             Err(e) => {
                 log::error!("Failed to connect redis: {:?}", &redis.url);
-                Some(Err(e.into()))
+                Err(e.into())
             }
         }
+    }
+    fn deps() -> Vec<std::any::TypeId> {
+        nuclear::declare_deps![Config]
     }
 }

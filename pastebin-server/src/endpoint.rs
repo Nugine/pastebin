@@ -1,25 +1,26 @@
 use crate::cache::RecordCache;
 use crate::config::Config;
-use crate::crypto::Key;
+use crate::crypto::Crypto;
+use crate::dto::{FindRecordRes, Record, RecordJson, SaveRecordReq, SaveRecordRes};
 use crate::error::RecordError;
-use crate::record_types::{FindRecordRes, Record, RecordJson, SaveRecordReq, SaveRecordRes};
 use crate::repo::RecordRepo;
-use nuclear::re_exports::http::StatusCode;
-use nuclear::web::parser::{json::JsonExt as _, BodyError};
-use nuclear::{web, Request, Response, WebResult};
-use short_crypt::ShortCrypt;
+use nuclear::http::StatusCode;
+use nuclear::{
+    core::{InjectorExt, Request, Responder, Response, Result},
+    web::{self, body::BodyError, router::SimpleRouterExt},
+};
 use std::sync::Arc;
 
 // require: Config
-// require: ShortCrypt
+// require: Crypto
 // require: RecordRepo
 // require: RecordCache
 // pattern: "/records/:key"
-pub async fn find_record(req: Request) -> WebResult<Response> {
+pub async fn find_record(req: Request) -> Result<Response> {
     let key = {
-        let key = req.get_param("key").unwrap();
-        let crypt = req.inject_ref::<ShortCrypt>().unwrap();
-        Key::validate(&*crypt, key).ok_or_else(|| RecordError::BadKey)?
+        let key = req.param("key").unwrap();
+        let crypto = req.inject_ref::<Crypto>().unwrap();
+        crypto.validate(key).ok_or_else(|| RecordError::BadKey)?
     };
 
     let cache = req.inject_ref::<RecordCache>().unwrap();
@@ -93,21 +94,21 @@ pub async fn find_record(req: Request) -> WebResult<Response> {
         );
     }
 
-    web::reply::json(&res).map_err(log_json_err)?.into_result()
+    Ok(web::reply::json(res).res().map_err(log_json_err)?)
 }
 
 // require: Config
-// require: ShortCrypt
+// require: Crypto
 // require: RecordRepo
 // require: RecordCache
 // pattern: "/records"
-pub async fn save_record(mut req: Request) -> WebResult<Response> {
+pub async fn save_record(mut req: Request) -> Result<Response> {
     let save_req: SaveRecordReq = {
         let config = req.inject_ref::<Config>().unwrap();
-        let mut json_parser = web::parser::json::JsonParser::default();
+        let mut json_parser = web::body::JsonParser::default();
         json_parser.limit(config.security.max_post_size);
 
-        match req.parse_json(&json_parser).await {
+        match json_parser.parse(&mut req).await {
             Ok(s) => s,
             Err(e) => match e {
                 BodyError::Limit(_) => return Err(RecordError::TooLongContent.into()),
@@ -116,9 +117,11 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
                     return Err(RecordError::JsonError.into());
                 }
                 BodyError::ContentTypeMismatch => {
-                    return Ok(Response::new(StatusCode::BAD_REQUEST))
+                    let mut res = Response::new("");
+                    res.set_status(StatusCode::BAD_REQUEST);
+                    return Ok(res);
                 }
-                e => return Err(nuclear::error::fatal(e).into()),
+                e => return Err(e.into()),
             },
         }
     };
@@ -137,13 +140,13 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
     };
 
     let repo = req.inject_ref::<RecordRepo>().unwrap();
-    let crypt = req.inject_ref::<ShortCrypt>().unwrap();
+    let crypto = req.inject_ref::<Crypto>().unwrap();
 
     let record_json = Arc::new(RecordJson(serde_json::to_string(&record).unwrap()));
 
     let key = repo
         .save(
-            || Key::generate(&crypt),
+            || crypto.generate(),
             &*record_json,
             record.expiration_seconds,
         )
@@ -151,7 +154,7 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
 
     {
         let cache = req.inject_ref::<RecordCache>().unwrap();
-        let dead_time = (record.saving_time_seconds as u64)+ (record.expiration_seconds as u64);
+        let dead_time = (record.saving_time_seconds as u64) + (record.expiration_seconds as u64);
         if cache.is_updating() {
             cache.send_update(key.clone(), record_json, 0, dead_time);
         } else {
@@ -171,7 +174,5 @@ pub async fn save_record(mut req: Request) -> WebResult<Response> {
         );
     }
 
-    web::reply::json(&SaveRecordRes { key })
-        .unwrap()
-        .into_result()
+    web::reply::json(SaveRecordRes { key }).try_response()
 }

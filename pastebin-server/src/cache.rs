@@ -1,6 +1,7 @@
 use crate::crypto::Key;
-use crate::record_types::RecordJson;
+use crate::dto::RecordJson;
 use crate::repo::RecordRepo;
+
 use rand::Rng;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -225,16 +226,15 @@ impl RecordCache {
     }
 }
 
-use nuclear::re_exports::async_trait;
-use nuclear::{Injector, Provider, ProviderOutput};
-
-pub struct RecordCacheProvider;
+use crate::config::Config;
+use nuclear::core::async_trait;
+use nuclear::core::{Injector, Instance, Result};
 
 #[async_trait]
-impl Provider for RecordCacheProvider {
-    async fn resolve(&self, injector: &mut Injector) -> ProviderOutput {
-        let config = injector.inject_ref::<crate::config::Config>()?;
-        let repo = injector.inject_arc::<crate::repo::RecordRepo>()?;
+impl Instance for RecordCache {
+    async fn resolve(injector: &Injector) -> Result<Self> {
+        let config = injector.try_inject_ref::<Config>()?;
+        let repo = injector.try_inject_arc::<RecordRepo>()?;
 
         let mut record_cache = RecordCache::new();
         if let Some(mc) = config.memory_cache.as_ref() {
@@ -245,7 +245,10 @@ impl Provider for RecordCacheProvider {
             );
         }
 
-        injector.provide(record_cache);
-        Some(Ok(()))
+        Ok(record_cache)
+    }
+
+    fn deps() -> Vec<std::any::TypeId> {
+        nuclear::declare_deps![Config, RecordRepo]
     }
 }
