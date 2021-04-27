@@ -13,6 +13,8 @@ serde = { version = "1.0.125", features = ["derive"] }
 thiserror = "1.0.24"
 tokio = { version = "1.5.0", features = ["full"] }
 toml = "0.5.8"
+rand = "0.8.3"
+short-crypt = "1.0.25"
 
 [dependencies.nuclear]
 git = "https://github.com/Nugine/nuclear.git"
