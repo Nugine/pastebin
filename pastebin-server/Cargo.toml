@@ -15,6 +15,8 @@ tokio = { version = "1.5.0", features = ["full"] }
 toml = "0.5.8"
 rand = "0.8.3"
 short-crypt = "1.0.25"
+mobc-redis = "0.7.0"
+tracing = "0.1.25"
 
 [dependencies.nuclear]
 git = "https://github.com/Nugine/nuclear.git"
