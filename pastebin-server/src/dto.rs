@@ -1,4 +1,4 @@
-use super::crypto::Key;
+use crate::crypto::Key;
 
 use std::borrow::Cow;
 

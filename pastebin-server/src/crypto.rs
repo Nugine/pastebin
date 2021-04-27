@@ -1,4 +1,4 @@
-use super::config::Config;
+use crate::config::Config;
 
 use std::fmt::{self, Display};
 use std::time::{SystemTime, UNIX_EPOCH};

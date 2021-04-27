@@ -1,7 +1,7 @@
-use super::config::Config;
-use super::crypto::Key;
-use super::dto::RecordJson;
-use super::error::PastebinError;
+use crate::config::Config;
+use crate::crypto::Key;
+use crate::dto::RecordJson;
+use crate::error::PastebinError;
 
 use mobc_redis::{mobc, redis, RedisConnectionManager};
 use redis::aio::Connection;
