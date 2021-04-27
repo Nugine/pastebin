@@ -7,6 +7,7 @@ mod app {
     mod dto;
     mod error;
     mod repo;
+    mod limiter;
 }
 
 fn main() {
