@@ -10,5 +10,11 @@ edition = "2018"
 anyhow = "1.0.40"
 camino = "1.0.4"
 serde = { version = "1.0.125", features = ["derive"] }
+thiserror = "1.0.24"
 tokio = { version = "1.5.0", features = ["full"] }
 toml = "0.5.8"
+
+[dependencies.nuclear]
+git = "https://github.com/Nugine/nuclear.git"
+version = "0.0.9"
+rev = "225598f"
