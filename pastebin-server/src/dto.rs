@@ -1,11 +1,12 @@
 use crate::crypto::Key;
 
 use std::borrow::Cow;
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct RecordJson(pub Box<str>);
+#[derive(Debug, Clone)]
+pub struct RecordJson(pub Arc<str>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record<'a> {

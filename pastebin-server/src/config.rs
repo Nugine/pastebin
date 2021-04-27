@@ -9,7 +9,7 @@ pub struct Config {
     pub server: Server,
     pub security: Security,
     pub redis: Redis,
-    pub memory_cache: Option<MemoryCache>,
+    pub cache: Option<Cache>,
     pub limiter: Option<Limiter>,
 }
 
@@ -34,7 +34,7 @@ pub struct Redis {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct MemoryCache {
+pub struct Cache {
     pub update_duration_seconds: u32,
     pub capacity: usize,
 }

@@ -1,6 +1,7 @@
 use crate::config::Config;
 
 use std::fmt::{self, Display};
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use rand::Rng;
@@ -8,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use short_crypt::ShortCrypt;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct Key(Box<str>);
+pub struct Key(Arc<str>);
 
 impl Display for Key {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -52,6 +53,6 @@ impl Crypto {
         }
 
         s.make_ascii_lowercase();
-        Some(Key(s))
+        Some(Key(s.into()))
     }
 }

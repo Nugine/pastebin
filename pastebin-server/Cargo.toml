@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 camino = "1.0.4"
-serde = { version = "1.0.125", features = ["derive"] }
+serde = { version = "1.0.125", features = ["derive", "rc"] }
 thiserror = "1.0.24"
 tokio = { version = "1.5.0", features = ["full"] }
 toml = "0.5.8"
