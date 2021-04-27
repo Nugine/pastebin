@@ -7,7 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.40"
 camino = "1.0.4"
 serde = { version = "1.0.125", features = ["derive"] }
 thiserror = "1.0.24"
@@ -17,6 +16,9 @@ rand = "0.8.3"
 short-crypt = "1.0.25"
 mobc-redis = "0.7.0"
 tracing = "0.1.25"
+dashmap = "4.0.2"
+anyhow = "1.0.40"
+crossbeam-queue = "0.3.1"
 
 [dependencies.nuclear]
 git = "https://github.com/Nugine/nuclear.git"

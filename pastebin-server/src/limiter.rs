@@ -6,12 +6,12 @@ use nuclear::http::StatusCode;
 use nuclear::{BoxFuture, Middleware, Next, Request, Response, Result};
 use nuclear::{BoxedHandler, Handler, HandlerExt};
 
-use tokio::sync::oneshot;
+use tokio::task::JoinHandle;
 use tokio::time::interval;
 
 pub struct TokenBucket {
     current_tokens: Arc<AtomicU64>,
-    kill_tx: Option<oneshot::Sender<()>>,
+    daemon: Option<JoinHandle<()>>,
 
     period: Duration,
     amount: u64,
@@ -30,7 +30,7 @@ impl TokenBucket {
     pub fn new(period: Duration, amount: u64, capacity: u64) -> Self {
         Self {
             current_tokens: Arc::new(AtomicU64::from(0)),
-            kill_tx: None,
+            daemon: None,
             period,
             amount,
             capacity,
@@ -38,16 +38,15 @@ impl TokenBucket {
         }
     }
 
-    async fn daemon(
-        period: Duration,
-        amount: u64,
-        capacity: u64,
-        ct: Arc<AtomicU64>,
-        mut kill_rx: oneshot::Receiver<()>,
-    ) {
-        let mut i = interval(period);
+    async fn daemon(period: Duration, amount: u64, capacity: u64, ct: Arc<AtomicU64>) {
         let ct = &*ct;
-        let update = || {
+
+        let mut int = interval(period);
+        int.tick().await;
+
+        loop {
+            int.tick().await;
+
             let mut prev = ct.load(Ordering::SeqCst);
             loop {
                 let next = prev.saturating_add(amount).min(capacity);
@@ -56,17 +55,6 @@ impl TokenBucket {
                     Err(p) => prev = p,
                 }
             }
-        };
-
-        loop {
-            tokio::select! {
-                _ = &mut kill_rx => {
-                    break;
-                }
-                _ = i.tick() => {
-                    update();
-                }
-            };
         }
     }
 
@@ -85,27 +73,24 @@ impl TokenBucket {
     }
 
     pub fn spawn_daemon(&mut self) {
-        if self.kill_tx.is_some() {
+        if self.daemon.is_some() {
             tracing::warn!("this limiter has already a running daemon");
             return;
         }
 
-        let (tx, rx) = oneshot::channel();
-        self.kill_tx = Some(tx);
-        tokio::spawn(Self::daemon(
+        self.daemon = Some(tokio::spawn(Self::daemon(
             self.period,
             self.amount,
             self.capacity,
             Arc::clone(&self.current_tokens),
-            rx,
-        ));
+        )));
     }
 }
 
 impl Drop for TokenBucket {
     fn drop(&mut self) {
-        if let Some(tx) = self.kill_tx.take() {
-            let _ = tx.send(());
+        if let Some(daemon) = self.daemon.take() {
+            daemon.abort();
         }
     }
 }
