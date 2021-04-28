@@ -3,8 +3,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use nuclear::http::StatusCode;
-use nuclear::{BoxFuture, Middleware, Next, Request, Response, Result};
-use nuclear::{BoxedHandler, Handler, HandlerExt};
+use nuclear::{BoxFuture, Effect, HigherRankHandler, Request, Response, Result};
+use nuclear::{BoxedHandler, Handler};
 
 use tokio::task::JoinHandle;
 use tokio::time::interval;
@@ -16,14 +16,6 @@ pub struct TokenBucket {
     period: Duration,
     amount: u64,
     capacity: u64,
-
-    on_limit: BoxedHandler<'static>,
-}
-
-pub async fn create503(_: Request) -> Response {
-    let status = StatusCode::SERVICE_UNAVAILABLE;
-    let body = "503 Service temporarily unavailable";
-    Response::new(status, body.into())
 }
 
 impl TokenBucket {
@@ -34,7 +26,6 @@ impl TokenBucket {
             period,
             amount,
             capacity,
-            on_limit: create503.boxed(),
         }
     }
 
@@ -95,18 +86,38 @@ impl Drop for TokenBucket {
     }
 }
 
-impl<'a> Middleware<'a> for TokenBucket {
+impl<'a, S, H> Effect<'a, (&'a S, Request, &'a H)> for TokenBucket
+where
+    S: Send + Sync + 'static,
+    H: Handler<'a, S>,
+{
+    type Output = Result<Response>;
     type Future = BoxFuture<'a, Result<Response>>;
 
-    fn handle<'t, 'h>(&'t self, req: Request, next: Next<'h>) -> Self::Future
+    fn perform<'t>(&'t self, args: (&'a S, Request, &'a H)) -> Self::Future
     where
         't: 'a,
-        'h: 'a,
         Self: 'a,
     {
-        match self.consume() {
-            Some(()) => next.handle(req),
-            None => self.on_limit.handle(req),
-        }
+        let (state, req, next) = args;
+        Box::pin(async move {
+            match self.consume() {
+                Some(()) => next.handle(state, req).await,
+                None => {
+                    let status = StatusCode::SERVICE_UNAVAILABLE;
+                    let body = "503 Service temporarily unavailable";
+                    Ok(Response::new(status, body.into()))
+                }
+            }
+        })
     }
+}
+
+pub fn limit_qps<S>(h: impl HigherRankHandler<S>, qps: u64) -> BoxedHandler<S>
+where
+    S: Send + Sync + 'static,
+{
+    let mut tb = TokenBucket::new(Duration::from_secs(1), qps, qps);
+    tb.spawn_daemon();
+    h.wrap(tb).erased().boxed()
 }

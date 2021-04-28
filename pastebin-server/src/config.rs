@@ -5,6 +5,7 @@ use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Config {
     pub server: Server,
     pub security: Security,

@@ -144,6 +144,10 @@ impl RecordRepo {
         }
     }
 
+    pub fn spawn_updater(self: Arc<Self>) {
+        task::spawn(async move { self.updater().await });
+    }
+
     pub async fn save(
         &self,
         key_gen: impl Fn() -> Key,

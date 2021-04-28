@@ -1,0 +1,21 @@
+[server]
+addr = "localhost:6000"
+hostname = "localhost:6000"
+
+[security]
+crypto_key = "magic"
+max_post_size = 65536 # 64 KiB
+max_expiration_seconds = 2592123 # 30 days
+
+[redis]
+url = "redis://localhost:6379"
+key_prefix = "pastebin"
+max_open_connections = 32
+
+[cache]
+update_duration_seconds = 1
+capacity = 256
+
+[limiter]
+find_qps = 10000
+save_qps = 500

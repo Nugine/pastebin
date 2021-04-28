@@ -13,7 +13,7 @@ pub struct Record<'a> {
     pub title: Cow<'a, str>,
     pub lang: Cow<'a, str>,
     pub content: Cow<'a, str>,
-    pub saving_time_seconds: u32,
+    pub saving_time_seconds: u64,
     pub expiration_seconds: u32,
 }
 
@@ -35,7 +35,7 @@ pub struct FindRecordRes<'a> {
     pub title: Cow<'a, str>,
     pub lang: Cow<'a, str>,
     pub content: Cow<'a, str>,
-    pub saving_time_seconds: u32,
+    pub saving_time_seconds: u64,
     pub expiration_seconds: u32,
     pub view_count: u64,
 }
