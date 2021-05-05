@@ -25,5 +25,11 @@ else:
 
 os.system(f"ab -k -v 1 -n 1000000 -c 128 {target}")
 os.system(f"curl {target}")
-# os.system(f"wrk -t16 -c128 -d10s --latency {target}")
+print()
 os.system(f"curl {target}")
+print()
+
+os.system(f"wrk -t16 -c128 -d10s --latency {target}")
+print()
+os.system(f"curl {target}")
+print()

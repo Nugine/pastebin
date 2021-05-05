@@ -1,12 +1,8 @@
 use crate::crypto::Key;
 
 use std::borrow::Cow;
-use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone)]
-pub struct RecordJson(pub Arc<str>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record<'a> {
@@ -41,11 +37,11 @@ pub struct FindRecordRes<'a> {
 }
 
 impl<'a> FindRecordRes<'a> {
-    pub fn new(record: Record<'a>, view_count: u64) -> Self {
+    pub fn new(record: &'a Record, view_count: u64) -> Self {
         Self {
-            title: record.title,
-            lang: record.lang,
-            content: record.content,
+            title: Cow::Borrowed(&record.title),
+            lang: Cow::Borrowed(&record.lang),
+            content: Cow::Borrowed(&record.content),
             saving_time_seconds: record.saving_time_seconds,
             expiration_seconds: record.expiration_seconds,
             view_count,

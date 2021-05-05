@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::crypto::Crypto;
-use crate::dto::{FindRecordRes, Record, RecordJson, SaveRecordReq, SaveRecordRes};
+use crate::dto::{FindRecordRes, Record, SaveRecordReq, SaveRecordRes};
 use crate::error::PastebinError;
 use crate::limiter::limit_qps;
 use crate::repo::RecordRepo;
@@ -78,16 +78,13 @@ impl App {
             self.crypto.validate(key).ok_or(PastebinError::BadKey)?
         };
 
-        let (json, view_count) = self
+        let (record, view_count) = self
             .repo
             .access(&key)
             .await?
             .ok_or(PastebinError::NotFound)?;
 
-        let res: FindRecordRes = match serde_json::from_str::<Record>(json.0.as_ref()) {
-            Ok(record) => FindRecordRes::new(record, view_count),
-            Err(json_err) => bail!(PastebinError::JsonError, ?key, %json_err, "FIND"),
-        };
+        let res: FindRecordRes = FindRecordRes::new(&record, view_count);
 
         tracing::info!(
             "FIND key = {0}, url = http://{1}/{0} , view_count = {2}",
@@ -122,21 +119,17 @@ impl App {
             bail!(PastebinError::TooLongExpirations)
         }
 
-        let record: Record = Record {
+        let record = Arc::new(Record {
             title: save_req.title,
             lang: save_req.lang,
             content: save_req.content,
             saving_time_seconds: now(),
             expiration_seconds: save_req.expiration_seconds,
-        };
-
-        let record_json = RecordJson(serde_json::to_string(&record).unwrap().into());
+        });
 
         let key_gen = || self.crypto.generate();
-        let key = self
-            .repo
-            .save(key_gen, &record_json, record.expiration_seconds)
-            .await?;
+        let expiration = record.expiration_seconds;
+        let key = self.repo.save(key_gen, record, expiration).await?;
 
         tracing::info!(
             "SAVE key = {0}, url = http://{1}/{0}",

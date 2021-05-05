@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::crypto::Key;
-use crate::dto::RecordJson;
+use crate::dto::Record;
 use crate::error::PastebinError;
 use crate::utils::now;
 
@@ -33,7 +33,7 @@ struct Cache {
 }
 
 struct CacheItem {
-    json: RecordJson,
+    record: Arc<Record<'static>>,
     view_count: u64,
     delta: AtomicU64,
     dead_time: u64,
@@ -151,7 +151,7 @@ impl RecordRepo {
     pub async fn save(
         &self,
         key_gen: impl Fn() -> Key,
-        json: &RecordJson,
+        record: Arc<Record<'static>>,
         expiration_seconds: u32,
     ) -> Result<Key> {
         let mut conn = self.get_conn().await?;
@@ -165,10 +165,12 @@ impl RecordRepo {
             }
         };
 
+        let json = serde_json::to_string(&*record).unwrap();
+
         let ret = redis::pipe()
             .atomic()
             .hset(&redis_key, Self::VIEW_COUNT_FIELD, 0_u64)
-            .hset(&redis_key, Self::JSON_FIELD, &*json.0)
+            .hset(&redis_key, Self::JSON_FIELD, &*json)
             .expire(&redis_key, expiration_seconds as usize)
             .query_async::<Connection, ()>(&mut conn)
             .await;
@@ -177,13 +179,15 @@ impl RecordRepo {
 
         if let Some(cache) = self.cache.as_ref() {
             let dead_time = now() + expiration_seconds as u64;
-            cache.update(key.clone(), json.clone(), 0, dead_time).await
+            cache
+                .update(key.clone(), Arc::clone(&record), 0, dead_time)
+                .await
         }
 
         Ok(key)
     }
 
-    pub async fn access(&self, key: &Key) -> Result<Option<(RecordJson, u64)>> {
+    pub async fn access(&self, key: &Key) -> Result<Option<(Arc<Record<'static>>, u64)>> {
         if let Some(cache) = self.cache.as_ref() {
             let cache_ret = cache.access(key);
             if cache_ret.is_some() {
@@ -207,16 +211,16 @@ impl RecordRepo {
             .await;
 
         let (view, json, ttl) = redis_try!(&redis_key, ret);
-        let json = RecordJson(json.into());
+        let record = Arc::new(serde_json::from_str(&json)?);
 
         if let Some(cache) = self.cache.as_ref() {
             let dead_time = now() + ttl;
             cache
-                .update(key.clone(), json.clone(), view, dead_time)
+                .update(key.clone(), Arc::clone(&record), view, dead_time)
                 .await
         }
 
-        Ok(Some((json, view)))
+        Ok(Some((record, view)))
     }
 }
 
@@ -230,17 +234,23 @@ impl RecordRepo {
 //     }
 
 impl Cache {
-    fn access(&self, key: &Key) -> Option<(RecordJson, u64)> {
+    fn access(&self, key: &Key) -> Option<(Arc<Record<'static>>, u64)> {
         let map = self.map.try_read().ok()?;
         let item = map.get(key)?;
         if item.dead_time <= now() {
             return None;
         }
         let delta: u64 = item.delta.fetch_add(1, Ordering::SeqCst) + 1;
-        Some((item.json.clone(), item.view_count + delta))
+        Some((item.record.clone(), item.view_count + delta))
     }
 
-    async fn update(&self, key: Key, json: RecordJson, view_count: u64, dead_time: u64) {
+    async fn update(
+        &self,
+        key: Key,
+        record: Arc<Record<'static>>,
+        view_count: u64,
+        dead_time: u64,
+    ) {
         if dead_time <= now() {
             return;
         }
@@ -248,13 +258,13 @@ impl Cache {
         match map.entry(key) {
             Entry::Occupied(mut entry) => {
                 let item = entry.get_mut();
-                item.json = json;
+                item.record = record;
                 item.view_count = item.view_count.max(view_count);
                 item.dead_time = item.dead_time.max(dead_time);
             }
             Entry::Vacant(entry) => {
                 entry.insert(CacheItem {
-                    json,
+                    record,
                     view_count,
                     dead_time,
                     delta: AtomicU64::new(0),
