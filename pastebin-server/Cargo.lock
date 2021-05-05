@@ -565,7 +565,6 @@ dependencies = [
  "futures",
  "hyper",
  "mime",
- "pin-project",
  "serde",
  "serde_json",
  "smallvec",

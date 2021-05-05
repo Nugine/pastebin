@@ -1,6 +1,6 @@
 use nuclear::http::StatusCode;
-use nuclear::web::reply::Json;
-use nuclear::Response;
+use nuclear::prelude::Response;
+use nuclear::response::Json;
 
 use serde::{Deserialize, Serialize};
 
@@ -49,6 +49,6 @@ impl PastebinError {
             message: self.to_string(),
         };
 
-        Json::new(status, res).res()
+        Json::new(status, res).into()
     }
 }

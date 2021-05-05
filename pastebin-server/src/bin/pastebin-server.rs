@@ -1,9 +1,9 @@
-use nuclear::HigherRankHandler;
 use pastebin_server::app::App;
 use pastebin_server::config::Config;
 
 use anyhow::{Context, Result};
 use camino::Utf8PathBuf;
+use nuclear::prelude::Handler;
 use structopt::StructOpt;
 
 fn setup_tracing() {
@@ -44,5 +44,5 @@ async fn main() -> Result<()> {
 
     let addr = config.server.addr.clone();
     let app = App::new(config)?;
-    app.handler().into_server().run(addr).await
+    app.into_handler().into_server().run(addr).await
 }

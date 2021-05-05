@@ -3,8 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use nuclear::http::StatusCode;
-use nuclear::{BoxFuture, Effect, HigherRankHandler, Request, Response, Result};
-use nuclear::{BoxedHandler, Handler};
+use nuclear::prelude::{BoxFuture, Handler, Middleware, Request, Response, Result};
 
 use tokio::task::JoinHandle;
 use tokio::time::interval;
@@ -86,23 +85,44 @@ impl Drop for TokenBucket {
     }
 }
 
-impl<'a, S, H> Effect<'a, (&'a S, Request, &'a H)> for TokenBucket
-where
-    S: Send + Sync + 'static,
-    H: Handler<'a, S>,
-{
-    type Output = Result<Response>;
-    type Future = BoxFuture<'a, Result<Response>>;
+// impl< S, H> Middleware for TokenBucket
+// {
+//     type Output = Result<Response>;
+//     type Future = BoxFuture<'a, Result<Response>>;
 
-    fn perform<'t>(&'t self, args: (&'a S, Request, &'a H)) -> Self::Future
+//     fn perform<'t>(&'t self, args: (&'a S, Request, &'a H)) -> Self::Future
+//     where
+//         't: 'a,
+//         Self: 'a,
+//     {
+//         let (state, req, next) = args;
+//         Box::pin(async move {
+//             match self.consume() {
+//                 Some(()) => next.handle(state, req).await,
+//                 None => {
+//                     let status = StatusCode::SERVICE_UNAVAILABLE;
+//                     let body = "503 Service temporarily unavailable";
+//                     Ok(Response::new(status, body.into()))
+//                 }
+//             }
+//         })
+//     }
+// }
+
+impl Middleware for TokenBucket {
+    fn handle<'t, 'n, 'a>(
+        &'t self,
+        req: Request,
+        next: &'n dyn Handler,
+    ) -> BoxFuture<'a, Result<Response>>
     where
         't: 'a,
+        'n: 'a,
         Self: 'a,
     {
-        let (state, req, next) = args;
         Box::pin(async move {
             match self.consume() {
-                Some(()) => next.handle(state, req).await,
+                Some(()) => next.handle(req).await,
                 None => {
                     let status = StatusCode::SERVICE_UNAVAILABLE;
                     let body = "503 Service temporarily unavailable";
@@ -113,11 +133,8 @@ where
     }
 }
 
-pub fn limit_qps<S>(h: impl HigherRankHandler<S>, qps: u64) -> BoxedHandler<S>
-where
-    S: Send + Sync + 'static,
-{
+pub fn limit_qps(h: impl Handler, qps: u64) -> impl Handler {
     let mut tb = TokenBucket::new(Duration::from_secs(1), qps, qps);
     tb.spawn_daemon();
-    h.wrap(tb).erased().boxed()
+    h.wrap(tb)
 }

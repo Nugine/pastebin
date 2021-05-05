@@ -8,11 +8,12 @@ use crate::utils::now;
 
 use std::sync::Arc;
 
-use nuclear::web::body::{BodyError, JsonParser};
-use nuclear::web::errors::CatchExt;
-use nuclear::web::reply::Json;
-use nuclear::web::router::{SimpleRouter, SimpleRouterExt};
-use nuclear::{endpoint, Handler, HigherRankHandler, Request, Response, Result};
+use nuclear::body::{BodyError, JsonParser};
+use nuclear::error::CatchExt;
+use nuclear::functional::{ref_handler, ref_middleware};
+use nuclear::prelude::{Handler, Request, Response, Result};
+use nuclear::response::Json;
+use nuclear::router::{SimpleRouter, SimpleRouterExt};
 
 pub struct App {
     config: Config,
@@ -43,27 +44,25 @@ impl App {
         })
     }
 
-    pub fn handler(self) -> impl HigherRankHandler<()> {
+    pub fn into_handler(self) -> impl Handler {
+        let mut find = ref_handler(Self::find_record).boxed();
+        let mut save = ref_handler(Self::save_record).boxed();
+        let recover = ref_middleware(Self::recover);
+
         let mut router = SimpleRouter::new();
 
-        let find;
-        let save;
-
         if let Some(ref limiter) = self.config.limiter {
-            find = limit_qps(Self::find_record, limiter.find_qps as u64);
-            save = limit_qps(Self::save_record, limiter.save_qps as u64);
-        } else {
-            find = endpoint(Self::find_record);
-            save = endpoint(Self::save_record);
+            find = limit_qps(find, limiter.find_qps as u64).boxed();
+            save = limit_qps(save, limiter.save_qps as u64).boxed();
         }
 
         router.at("/records/:key").get(find);
         router.at("/records").post(save);
-        router.after(Self::recover).with_state(self)
+        router.wrap(recover).with_state(Arc::new(self))
     }
 
-    async fn recover(&self, result: Result<Response>) -> Result<Response> {
-        match result.catch::<PastebinError>() {
+    async fn recover(&self, req: Request, next: &dyn Handler) -> Result<Response> {
+        match next.handle(req).await.catch::<PastebinError>() {
             Ok(Ok(res)) => Ok(res),
             Ok(Err(err)) => err.res(),
             Err(err) => {
@@ -97,7 +96,7 @@ impl App {
             view_count,
         );
 
-        Json::ok(res).res()
+        Json::ok(res).into()
     }
 
     async fn save_record(&self, mut req: Request) -> Result<Response> {
@@ -145,6 +144,6 @@ impl App {
             self.config.server.hostname
         );
 
-        Json::ok(SaveRecordRes { key }).res()
+        Json::ok(SaveRecordRes { key }).into()
     }
 }
