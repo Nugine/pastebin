@@ -1,13 +1,19 @@
 import "./App.css";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { observer, useLocalObservable } from "mobx-react-lite";
 import Container from "react-bootstrap/Container";
 
 import Editor from "./pages/Editor";
 import Show from "./pages/Show";
-import { useDelay } from "./lib/utils";
+
+function useDelay(f: () => void, ms: number): void {
+    useEffect(() => {
+        const timer = setTimeout(f, ms);
+        return () => clearTimeout(timer);
+    });
+}
 
 const Footer: React.FC = observer(() => {
     const v = useLocalObservable(() => ({
@@ -30,7 +36,7 @@ const Footer: React.FC = observer(() => {
                 © {nowYear > 2019 ? `2019 - ${nowYear}` : "2019"} {authorLink}
             </span>
             {v.displayRepo ? (
-                <span style={{marginLeft: "0.5em"}}>
+                <span style={{ marginLeft: "0.5em" }}>
                     <a href="https://github.com/Nugine/pastebin" target="_blank" rel="noopener noreferrer">
                         <img
                             alt="GitHub stars"
