@@ -557,7 +557,8 @@ dependencies = [
 
 [[package]]
 name = "nuclear"
-version = "0.0.9"
+version = "0.0.10-dev"
+source = "git+https://github.com/Nugine/nuclear.git?rev=68d67a9#68d67a9922c71f79e0d711fa2191f6db90610f05"
 dependencies = [
  "anyhow",
  "async-trait",
