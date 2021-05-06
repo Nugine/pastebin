@@ -67,7 +67,7 @@ export const expirations: Expiration[] = [
 
 // -------------------------------------------
 
-const langs: Lang[] = (() => {
+export const langs: Lang[] = (() => {
     const langArray: Lang[] = [];
 
     langArray.push({

@@ -3,12 +3,8 @@
     border-color: #ccc;
 }
 
-code,
-.code-area {
-    font-family: "Fira Code", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, "Helvetica Neue", "微软雅黑", Arial, "Noto Sans", sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji" !important;
+code, .code-area {
+    font-family: "Fira Code", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "微软雅黑", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
 .btn-outline-light:hover {
@@ -35,8 +31,7 @@ code,
     margin-right: 0.2rem;
 }
 
-pre[class*="language-"]::after,
-pre[class*="language-"]::before {
+pre[class*="language-"]::after, pre[class*="language-"]::before {
     box-shadow: none !important;
 }
 
