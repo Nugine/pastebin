@@ -80,7 +80,8 @@ const Show: React.FC = observer(() => {
             </div>
             <div className="hidden-at-small-lv2">
                 <span className="mock-btn bar-item">
-                    View: {record.view_count ?? 0}
+                    <i className="fa fa-eye" aria-hidden="true" style={{ marginRight: "0.5em" }}></i>
+                    {record.view_count}
                 </span>
                 <span className="mock-btn hidden-at-small bar-item" >
                     {formatNow(record.saving_time_seconds)}
@@ -128,7 +129,7 @@ const Show: React.FC = observer(() => {
 
     return (
         <>
-            {showBar}
+            {record.view_count !== undefined ? (showBar) : null}
             {view}
             {qrModal}
         </>
