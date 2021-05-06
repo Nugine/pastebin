@@ -90,6 +90,18 @@ interface ViewProps {
 }
 
 const View: React.FC<ViewProps> = ({ hidden, title, lang, content }: ViewProps) => {
+    const titleH1 = title !== undefined ? (
+        <h1 style={{ textAlign: "center" }}>
+            {title}
+        </h1>
+    ) : null;
+
+    const view = lang === "markdown" ? (
+        <MarkdownView content={content} />
+    ) : (
+        <CodeView lang={lang} content={content} />
+    );
+
     return (
         <div
             style={{
@@ -99,16 +111,8 @@ const View: React.FC<ViewProps> = ({ hidden, title, lang, content }: ViewProps) 
             }}
             className="code-area line-numbers"
         >
-            {title !== undefined ? (
-                <h1 style={{ textAlign: "center" }}>
-                    {title}
-                </h1>
-            ) : null}
-            {lang === "markdown"?(
-                <MarkdownView content={content} />
-            ):(
-                <CodeView lang={lang} content={content} />
-            )}
+            {titleH1}
+            {view}
         </div>
     );
 };

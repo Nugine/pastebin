@@ -121,3 +121,20 @@ export function findLangExt(langValue: string): string | null {
     }
     return null;
 }
+
+export function downloadFile(record: PastebinRecord, key: string): void {
+    const toKebabCase = (s: string) => s.split(" ").map((p) => p.toLowerCase()).join("-");
+    const fileExt = findLangExt(record.lang) ?? ".txt";
+    const isValid = record.title !== "" && record.title.split("").reduce(
+        (acc, x) => (
+            acc && ("~`!@#$%^&*()-+={}[]|:;\"'<>,.?/\b\f\n\r\t\v\\\0".indexOf(x) === -1)
+        ), true);
+    const fileName = isValid ? (record.title) : (`${toKebabCase(PROJECT_NAME)}-${key}`);
+    const a = document.createElement("a");
+    a.download = `${fileName}${fileExt}`;
+    a.href = URL.createObjectURL(new Blob([record.content]));
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}

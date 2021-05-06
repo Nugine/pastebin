@@ -48,3 +48,15 @@ pre[class*="language-"]::after, pre[class*="language-"]::before {
     border-radius: 0.25rem;
     border-color: #ccc;
 }
+
+@media screen and (max-width: 630px) {
+    .hidden-at-small {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 340px) {
+    .hidden-at-small-lv2 {
+        display: none !important;
+    }
+}
