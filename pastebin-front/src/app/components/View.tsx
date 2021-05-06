@@ -29,6 +29,7 @@ const MarkdownView: React.FC<MarkdownViewProps> = ({ content }: MarkdownViewProp
 
     useEffect(() => {
         setInner(markdown.render(content));
+
         setImmediate(() => {
             if (divRef.current) {
                 prism.highlightAllUnder(divRef.current, false);

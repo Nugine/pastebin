@@ -1,12 +1,12 @@
+import "./App.css";
+
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { observer, useLocalObservable } from "mobx-react-lite";
-
 import Container from "react-bootstrap/Container";
 
 import Editor from "./pages/Editor";
 import Show from "./pages/Show";
-
 import { useDelay } from "./lib/utils";
 
 const Footer: React.FC = observer(() => {

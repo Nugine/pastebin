@@ -80,7 +80,7 @@ const Show: React.FC = observer(() => {
             </div>
             <div className="hidden-at-small-lv2">
                 <span className="mock-btn bar-item">
-                    View: {record.view_count}
+                    View: {record.view_count ?? 0}
                 </span>
                 <span className="mock-btn hidden-at-small bar-item" >
                     {formatNow(record.saving_time_seconds)}
