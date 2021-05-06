@@ -12,12 +12,9 @@
     "@types/react-dom": "^17.0.3",
     "bootstrap": "^4.6.0",
     "copy-to-clipboard": "^3.3.1",
-    "eslint": "^7.25.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-react": "^7.23.2",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "font-awesome": "^4.7.0",
     "katex": "^0.13.5",
+    "markdown-it": "^12.0.6",
     "mobx-react-lite": "^3.2.0",
     "prismjs": "^1.23.0",
     "qrcode": "^1.4.4",
@@ -54,6 +51,13 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.7"
+    "@types/katex": "^0.11.0",
+    "@types/markdown-it": "^12.0.1",
+    "@types/prismjs": "^1.16.5",
+    "@types/react-router-dom": "^5.1.7",
+    "eslint": "^7.25.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }

@@ -4,10 +4,10 @@ import { observer, useLocalObservable } from "mobx-react-lite";
 
 import Container from "react-bootstrap/Container";
 
-import Editor from "./Editor";
-import Show from "./Show";
+import Editor from "./pages/Editor";
+import Show from "./pages/Show";
 
-import { useDelay } from "./utils";
+import { useDelay } from "./lib/utils";
 
 const Footer: React.FC = observer(() => {
     const v = useLocalObservable(() => ({
