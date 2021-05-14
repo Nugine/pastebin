@@ -12,7 +12,6 @@ use nuclear::body::{BodyError, JsonParser};
 use nuclear::error::CatchExt;
 use nuclear::functional::{ref_handler, ref_middleware};
 use nuclear::prelude::{Handler, Request, Response, Result};
-use nuclear::response::Json;
 use nuclear::router::{SimpleRouter, SimpleRouterExt};
 
 pub struct App {
@@ -64,7 +63,7 @@ impl App {
     async fn recover(&self, req: Request, next: &dyn Handler) -> Result<Response> {
         match next.handle(req).await.catch::<PastebinError>() {
             Ok(Ok(res)) => Ok(res),
-            Ok(Err(err)) => err.res(),
+            Ok(Err(err)) => err.res().await,
             Err(err) => {
                 tracing::error!(%err);
                 Err(err)
@@ -92,8 +91,7 @@ impl App {
             self.config.server.hostname,
             view_count,
         );
-
-        Json::ok(res).into()
+        Response::json(res).map_err(Into::into)
     }
 
     async fn save_record(&self, mut req: Request) -> Result<Response> {
@@ -137,6 +135,7 @@ impl App {
             self.config.server.hostname
         );
 
-        Json::ok(SaveRecordRes { key }).into()
+        let res = SaveRecordRes { key };
+        Response::json(res).map_err(Into::into)
     }
 }

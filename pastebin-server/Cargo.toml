@@ -26,4 +26,4 @@ tracing-subscriber = { version = "0.2.17", features = ["parking_lot"] }
 [dependencies.nuclear]
 git = "https://github.com/Nugine/nuclear.git"
 version = "0.0.10-dev"
-rev = "68d67a9"
+rev = "11a1d8b"

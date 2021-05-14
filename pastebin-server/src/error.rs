@@ -1,6 +1,5 @@
 use nuclear::http::StatusCode;
 use nuclear::prelude::Response;
-use nuclear::response::Json;
 
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +32,7 @@ pub struct ApiErrorRes {
 }
 
 impl PastebinError {
-    pub fn res(self) -> nuclear::Result<Response> {
+    pub async fn res(self) -> nuclear::Result<Response> {
         use PastebinError::*;
 
         let status: StatusCode = match self {
@@ -49,6 +48,6 @@ impl PastebinError {
             message: self.to_string(),
         };
 
-        Json::new(status, res).into()
+        Ok(Response::json(res)?.with_status(status))
     }
 }
