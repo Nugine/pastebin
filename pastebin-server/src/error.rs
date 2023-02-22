@@ -11,11 +11,10 @@ pub struct PastebinError {
 #[derive(Debug, Clone, Copy)]
 pub enum PastebinErrorCode {
     InternalError = 1001,
+    Unavailable = 1002,
 
     BadKey = 2001,
-
     TooLongExpirations = 2002,
-
     TooLongContent = 2003,
 
     NotFound = 3001,
@@ -27,6 +26,7 @@ impl PastebinErrorCode {
 
         match self {
             InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+            Unavailable => StatusCode::SERVICE_UNAVAILABLE,
             BadKey => StatusCode::BAD_REQUEST,
             TooLongExpirations => StatusCode::BAD_REQUEST,
             TooLongContent => StatusCode::BAD_REQUEST,

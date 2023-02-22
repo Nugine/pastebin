@@ -22,16 +22,15 @@ use axum::Router;
 use anyhow::Result;
 use serde::Serialize;
 use tracing::error;
+use tracing::warn;
 
 pub fn build(config: &Config) -> Result<Router> {
     let svc = PastebinService::new(config)?;
 
     let middleware = tower::ServiceBuilder::new()
-        .layer(HandleErrorLayer::new(|err: BoxError| async move {
-            error!(?err);
-            Json(PastebinError::from(PastebinErrorCode::InternalError))
-        }))
+        .layer(HandleErrorLayer::new(handle_error))
         .buffer(4096)
+        .load_shed()
         .rate_limit(config.security.max_qps.into(), Duration::from_secs(1))
         .into_inner();
 
@@ -43,6 +42,16 @@ pub fn build(config: &Config) -> Result<Router> {
         .layer(DefaultBodyLimit::max(config.security.max_body_length));
 
     Ok(router)
+}
+
+async fn handle_error(err: BoxError) -> Json<PastebinError> {
+    if err.is::<tower::load_shed::error::Overloaded>() {
+        warn!("load shed: overloaded");
+        return Json(PastebinErrorCode::Unavailable.into());
+    }
+
+    error!(?err);
+    Json(PastebinErrorCode::InternalError.into())
 }
 
 fn json_result<T, E>(ret: Result<T, E>) -> Response
@@ -59,11 +68,15 @@ where
 type AppState = State<Arc<PastebinService>>;
 
 /// GET /records/:key
-async fn find_record(State(svc): AppState, Path(key): Path<String>) -> Response {
+///
+/// -> JSON FindRecordOutput
+pub async fn find_record(State(svc): AppState, Path(key): Path<String>) -> Response {
     json_result(svc.find_record(FindRecordInput { key }).await)
 }
 
-/// PUT /records
-async fn save_record(State(svc): AppState, Json(payload): Json<SaveRecordInput>) -> Response {
+/// PUT /records    
+///
+/// JSON SaveRecordInput -> JSON SaveRecordOutput
+pub async fn save_record(State(svc): AppState, Json(payload): Json<SaveRecordInput>) -> Response {
     json_result(svc.save_record(payload).await)
 }
