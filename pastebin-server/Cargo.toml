@@ -10,7 +10,6 @@ axum = "0.6.7"
 bytestring = { version = "1.2.0", features = ["serde"] }
 camino = "1.1.2"
 clap = { version = "4.1.6", features = ["derive"] }
-dashmap = "5.4.0"
 mobc-redis = "0.8.0"
 rand = "0.8.5"
 serde = { version = "1.0.152", features = ["derive"] }

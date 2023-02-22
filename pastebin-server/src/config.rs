@@ -21,7 +21,11 @@ pub struct ServerConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SecurityConfig {
     pub secret_key: String,
+
+    // TODO: serde with human readable bytes representation
+    // <https://docs.rs/bytesize>
     pub max_body_length: usize,
+
     pub max_expiration_seconds: u32,
     pub max_qps: u32,
 }
