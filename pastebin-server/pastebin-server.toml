@@ -4,7 +4,7 @@ host_addr = "localhost:8000"
 
 [security]
 secret_key = "magic"
-max_post_size = 262144 # 256 KiB
+max_body_length = 262144 # 256 KiB
 max_expiration_seconds = 2592123 # 30 days
 max_qps = 1000
 

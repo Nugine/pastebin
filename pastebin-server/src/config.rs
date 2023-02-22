@@ -21,7 +21,7 @@ pub struct ServerConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SecurityConfig {
     pub secret_key: String,
-    pub max_post_size: usize,
+    pub max_body_length: usize,
     pub max_expiration_seconds: u32,
     pub max_qps: u32,
 }

@@ -8,6 +8,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use axum::error_handling::HandleErrorLayer;
+use axum::extract::DefaultBodyLimit;
 use axum::extract::Path;
 use axum::extract::State;
 use axum::response::IntoResponse;
@@ -34,11 +35,14 @@ pub fn build(config: &Config) -> Result<Router> {
         .rate_limit(config.security.max_qps.into(), Duration::from_secs(1))
         .into_inner();
 
-    Ok(Router::new()
+    let router = Router::new()
         .route("/records/:key", get(find_record))
         .route("/records", put(save_record))
         .with_state(Arc::new(svc))
-        .layer(middleware))
+        .layer(middleware)
+        .layer(DefaultBodyLimit::max(config.security.max_body_length));
+
+    Ok(router)
 }
 
 fn json_result<T, E>(ret: Result<T, E>) -> Response
