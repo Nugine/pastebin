@@ -3,5 +3,6 @@
 pub mod config;
 pub mod crypto;
 pub mod dto;
+pub mod error;
 pub mod redis;
 pub mod time;
