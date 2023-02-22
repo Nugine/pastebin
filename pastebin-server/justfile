@@ -1,0 +1,3 @@
+dev:
+    cargo clippy
+    cargo test
