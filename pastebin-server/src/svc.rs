@@ -16,9 +16,10 @@ pub struct PastebinService {
 }
 
 impl PastebinService {
-    pub fn new(config: Config) -> Result<Self> {
+    pub fn new(config: &Config) -> Result<Self> {
         let db = RedisStorage::new(&config.redis)?;
         let crypto = Crypto::new(&config.security.secret_key);
+        let config = config.clone();
         Ok(Self { config, db, crypto })
     }
 

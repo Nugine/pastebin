@@ -1,14 +1,15 @@
 #![feature(is_terminal)]
 #![deny(clippy::all)]
 
+use camino::Utf8Path;
 use pastebin_server::config::Config;
-use pastebin_server::svc::PastebinService;
 
 use std::io::IsTerminal;
 use std::net::TcpListener;
 
 use anyhow::Context;
 use anyhow::Result;
+use axum::Router;
 use camino::Utf8PathBuf;
 use clap::Parser;
 use tracing::info;
@@ -26,22 +27,9 @@ async fn main() -> Result<()> {
 
     let opt = Opt::parse();
 
-    let config = Config::from_toml(&opt.config)
-        .with_context(|| format!("Failed to read config from {:?}", opt.config))?;
-
-    let addr = config.server.bind_addr.clone();
-
-    let svc = PastebinService::new(config)?;
-    let app = pastebin_server::web::build(svc);
-
-    let listener = TcpListener::bind(&addr)?;
-    let server = axum::Server::from_tcp(listener)?
-        .serve(app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal());
-
-    info!("listening on {}", addr);
-
-    server.await?;
+    let config = load_config(&opt.config)?;
+    let app = pastebin_server::web::build(&config)?;
+    serve(app, &config.server.bind_addr).await?;
 
     Ok(())
 }
@@ -60,6 +48,21 @@ fn setup_tracing() {
         .with_env_filter(env_filter)
         .with_ansi(enable_color)
         .init()
+}
+
+fn load_config(path: &Utf8Path) -> Result<Config> {
+    Config::from_toml(path).with_context(|| format!("Failed to read config from {:?}", path))
+}
+
+async fn serve(app: Router, addr: &str) -> Result<()> {
+    let listener = TcpListener::bind(addr)?;
+    let server = axum::Server::from_tcp(listener)?
+        .serve(app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal());
+
+    info!("listening on {}", addr);
+    server.await?;
+    Ok(())
 }
 
 async fn shutdown_signal() {
