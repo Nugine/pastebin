@@ -1,26 +1,29 @@
 <template>
     <div class="btn-bar">
-        <XButton class="btn" @click="handleEdit" title="编辑本条记录">
+        <XButton @click="handleEdit" title="编辑本条记录">
             <IconEdit theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" @click="handleCopy" :class="copyBtnClass" title="将内容复制到剪贴板">
+        <XButton @click="handleCopy" :class="copyBtnClass" title="将内容复制到剪贴板">
             <IconCopy theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" @click="qrcodeModal.open()" title="显示二维码">
+        <XButton @click="qrcodeModal.open()" title="显示二维码">
             <IconQRCode theme="outline" size="16" fill="#333" :stroke-width="5" />
         </XButton>
-        <XButton class="btn" @click="handleDownload" title="下载本条记录">
+        <XButton @click="handleDownload" title="下载本条记录">
             <IconDownload theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" disabled title="访问次数">
+        <XButton disabled title="访问次数">
             <IconView theme="outline" size="16" fill="#333" :stroke-width="5" />
             {{ store.record.view_count }}
+        </XButton>
+        <XButton disabled title="提交时刻" class="hide-sm">
+            {{ saving_time }}
         </XButton>
     </div>
     <XModal :show="qrcodeModal.show">
         <div class="modal-header">
             <span class="modal-title">{{ qrcodeModal.title }}</span>
-            <XButton class="btn" @click="qrcodeModal.close()">
+            <XButton @click="qrcodeModal.close()">
                 <IconClose theme="filled" size="16" fill="#333" />
             </XButton>
         </div>
@@ -58,6 +61,12 @@
 
     display: flex;
     justify-content: center;
+}
+
+@media screen and (max-width: 630px) {
+    .hide-sm {
+        display: none !important;
+    }
 }
 </style>
 
@@ -144,4 +153,23 @@ function handleDownload() {
     const fileExt = findLangExt(record.lang) ?? ".txt";
     downloadFile(fileName + fileExt, record.content);
 }
+
+// 日期 ----------------------------
+
+function formatTimestamp(now: Date) {
+    const pad = (n: number): string => n.toString().padStart(2, "0");
+
+    const [y, m, d] = [now.getFullYear(), now.getMonth() + 1, now.getDate()];
+    const [hh, mm, ss] = [now.getHours(), now.getMinutes(), now.getSeconds()];
+
+    const date = `${y}-${pad(m)}-${pad(d)}`;
+    const time = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+    return `${date} ${time}`;
+}
+
+function toDateOrNow(sec?: number): Date {
+    return sec !== undefined ? new Date(sec * 1000) : new Date();
+}
+
+const saving_time = computed(() => formatTimestamp(toDateOrNow(store.record.saving_time)));
 </script>
