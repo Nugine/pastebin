@@ -1,5 +1,5 @@
 import "@icon-park/vue-next/styles/index.css";
-import "./main.css";
+import "./styles/index.css";
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";

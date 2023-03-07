@@ -3,7 +3,7 @@
         <div class="fade backdrop" :class="{ show: show }"></div>
         <div class="fade modal" :class="{ show: show }">
             <div class="modal-dialog">
-                <slot/>
+                <slot />
             </div>
         </div>
     </Teleport>
@@ -48,7 +48,7 @@
     position: relative;
     width: auto;
     max-width: 500px;
-    margin: 1.75rem auto;
+    margin: 1rem 0.5rem;
     pointer-events: auto;
 
     display: flex;

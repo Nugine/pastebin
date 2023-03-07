@@ -1,5 +1,5 @@
 <template>
-    <main class="main-container">
+    <main class="container-lg">
         <RouterView />
     </main>
     <footer>
