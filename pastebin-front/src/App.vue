@@ -1,8 +1,8 @@
 <template>
-    <div style="flex-grow: 1; width: 100%; margin-top: 1em">
+    <main>
         <RouterView />
-    </div>
-    <footer style="margin-bottom: 1em">
+    </main>
+    <footer>
         <span>
             © 2019 - 2023
             <a href="https://github.com/Nugine/pastebin" target="_blank">Nugine/pastebin</a>
@@ -11,7 +11,17 @@
     </footer>
 </template>
 
-<style scoped></style>
+<style scoped>
+main {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1140px;
+    margin-top: 1em;
+}
+footer {
+    margin-bottom: 1em;
+}
+</style>
 
 <script setup lang="ts">
 import { RouterView } from "vue-router";
