@@ -38,17 +38,16 @@
     left: 0;
     z-index: 1050;
     width: 100%;
-    height: 100%;
     overflow: hidden;
     outline: 0;
     display: block;
+    padding: 1rem 0.5rem;
 }
 
 .modal-dialog {
-    position: relative;
     width: auto;
     max-width: 500px;
-    margin: 1rem 0.5rem;
+    margin: 0 auto;
     pointer-events: auto;
 
     display: flex;

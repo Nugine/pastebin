@@ -9,7 +9,7 @@
         <button class="btn" type="button" @click="qrcodeModal.open()">
             <IconQRCode theme="outline" size="16" fill="#333" :stroke-width="5" />
         </button>
-        <AppModal :show="qrcodeModal.show">
+        <XModal :show="qrcodeModal.show">
             <div class="modal-header">
                 <span class="modal-title">{{ qrcodeModal.title }}</span>
                 <button class="btn" type="button" @click="qrcodeModal.close()">
@@ -19,13 +19,13 @@
             <div class="modal-content">
                 <img :src="qrcodeModal.dataUrl" :alt="currentUrl" />
             </div>
-        </AppModal>
+        </XModal>
         <button class="btn" type="button" @click="handleDownload">
             <IconDownload theme="outline" size="16" fill="#333" />
         </button>
         <button class="btn" type="button" disabled>
             <IconView theme="outline" size="16" fill="#333" :stroke-width="5" />
-            1
+            {{ store.record.view_count }}
         </button>
     </div>
 </template>
@@ -57,7 +57,6 @@
 
     display: flex;
     justify-content: center;
-    flex: "1 1 auto";
 }
 </style>
 
@@ -69,18 +68,33 @@ import IconDownload from "@icon-park/vue-next/es/icons/Download";
 import IconView from "@icon-park/vue-next/es/icons/PreviewOpen";
 import IconClose from "@icon-park/vue-next/es/icons/Close";
 
-import { useRouter } from "vue-router";
-import { computed, onMounted, reactive } from "vue";
-
 import qrcode from "qrcode";
 
-import AppModal from "@/components/AppModal.vue";
+import { useRoute, useRouter } from "vue-router";
+import { computed, onMounted, reactive, watchEffect } from "vue";
 
+import XModal from "@/components/XModal.vue";
 import { useCopyBtn } from "@/logic";
 import { useStore } from "@/data/store";
+import * as api from "@/data/api";
 
 const store = useStore();
 const router = useRouter();
+
+// 载入数据 ----------------------------
+
+const route = useRoute();
+
+watchEffect(async () => {
+    const key = route.params.key as string;
+    const result = await api.findRecord({ key });
+    if (result.ok) {
+        store.record = result.value;
+    } else {
+        console.error("查询失败", result.error);
+        router.push("/");
+    }
+});
 
 // 编辑 ----------------------------
 

@@ -7,7 +7,7 @@ interface RecordBase {
 
 interface SavedRecordMixin {
     saving_time: number;
-    view_cound: number;
+    view_count: number;
 }
 
 export type PastebinRecord = RecordBase & Partial<SavedRecordMixin>;
