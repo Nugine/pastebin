@@ -1,14 +1,15 @@
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PastebinError {
-    pub code: u16,
+    pub code: PastebinErrorCode,
     pub message: String,
 }
 
 #[repr(u16)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize_repr, Deserialize_repr)]
 pub enum PastebinErrorCode {
     InternalError = 1001,
     Unavailable = 1002,
@@ -36,9 +37,8 @@ impl PastebinErrorCode {
 }
 
 impl From<PastebinErrorCode> for PastebinError {
-    fn from(ec: PastebinErrorCode) -> Self {
-        let code = ec as u16;
-        let message = format!("{ec:?}");
+    fn from(code: PastebinErrorCode) -> Self {
+        let message = format!("{code:?}");
         Self { code, message }
     }
 }

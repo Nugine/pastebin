@@ -44,25 +44,31 @@ pub fn build(config: &Config) -> Result<Router> {
     Ok(router)
 }
 
-async fn handle_error(err: BoxError) -> Json<PastebinError> {
+async fn handle_error(err: BoxError) -> Response {
     if err.is::<tower::load_shed::error::Overloaded>() {
         warn!("load shed: overloaded");
-        return Json(PastebinErrorCode::Unavailable.into());
+        return error_response(PastebinErrorCode::Unavailable.into());
     }
 
     error!(?err);
-    Json(PastebinErrorCode::InternalError.into())
+    error_response(PastebinErrorCode::InternalError.into())
 }
 
-fn json_result<T, E>(ret: Result<T, E>) -> Response
+fn json_result<T>(ret: Result<T, PastebinError>) -> Response
 where
     T: Serialize,
-    E: Serialize,
 {
     match ret {
         Ok(val) => Json(val).into_response(),
-        Err(err) => Json(err).into_response(),
+        Err(err) => error_response(err),
     }
+}
+
+fn error_response(err: PastebinError) -> Response {
+    let status = err.code.status();
+    let mut res = Json(err).into_response();
+    *res.status_mut() = status;
+    res
 }
 
 type AppState = State<Arc<PastebinService>>;
