@@ -1,6 +1,6 @@
 <template>
     <div class="view">
-        <div class="view-title" v-if="hasTitle">
+        <div class="view-title code-area" v-if="hasTitle">
             {{ props.record.title }}
         </div>
         <MarkdownView v-if="isMarkdown" :content="props.record.content" />

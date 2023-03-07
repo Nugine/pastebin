@@ -55,3 +55,7 @@ a:hover {
         max-width: 1140px;
     }
 }
+
+.code-area {
+    font-family: "Fira Code";
+}

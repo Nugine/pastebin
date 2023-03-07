@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 100%" v-html="contentHTML" ref="contentDiv"></div>
+    <div class="code-area" style="width: 100%" v-html="contentHTML" ref="contentDiv"></div>
 </template>
 
 <script setup lang="ts">
