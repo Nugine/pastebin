@@ -150,12 +150,16 @@ a:hover {
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.form-control:focus {
+.form-control:focus:not(.form-control-invalid) {
     color: #495057;
     background-color: #fff;
     border-color: #80bdff;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control-invalid {
+    border-color: #dc3545;
 }
 
 textarea.form-control {
