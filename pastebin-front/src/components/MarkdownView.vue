@@ -6,6 +6,7 @@
 import MarkdownIt from "markdown-it";
 import { computed, ref, toRef } from "vue";
 import { useHighlight } from "@/hooks/useHighlight";
+import { useKatex } from "@/hooks/useKatex";
 
 const props = defineProps<{
     content: string;
@@ -15,5 +16,7 @@ const markdown = new MarkdownIt();
 const contentHTML = computed(() => markdown.render(props.content));
 
 const contentDiv = ref<HTMLDivElement | null>(null);
-useHighlight(contentDiv, toRef(props, "content"));
+const contentRef = toRef(props, "content");
+useHighlight(contentDiv, contentRef);
+useKatex(contentDiv, contentRef);
 </script>

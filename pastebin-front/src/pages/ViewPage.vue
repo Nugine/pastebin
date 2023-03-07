@@ -68,6 +68,7 @@ import IconQRCode from "@icon-park/vue-next/es/icons/PayCodeOne";
 import IconDownload from "@icon-park/vue-next/es/icons/Download";
 import IconView from "@icon-park/vue-next/es/icons/PreviewOpen";
 import IconClose from "@icon-park/vue-next/es/icons/Close";
+import "@icon-park/vue-next/styles/index.css";
 
 import qrcode from "qrcode";
 
