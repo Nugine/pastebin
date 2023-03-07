@@ -1,6 +1,6 @@
 <template>
-    <div style="flex-grow: 1">
-        <h1>越过长城，走向世界！</h1>
+    <div style="flex-grow: 1; width: 100%; margin-top: 1em">
+        <RouterView />
     </div>
     <footer style="margin-bottom: 1em">
         <span>
@@ -13,4 +13,6 @@
 
 <style scoped></style>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { RouterView } from "vue-router";
+</script>
