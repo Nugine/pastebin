@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main class="main-container">
         <RouterView />
     </main>
     <footer>
@@ -14,10 +14,11 @@
 <style scoped>
 main {
     flex-grow: 1;
-    width: 100%;
-    max-width: 1140px;
-    margin-top: 1em;
+
+    display: flex;
+    flex-direction: column;
 }
+
 footer {
     margin-bottom: 1em;
 }
