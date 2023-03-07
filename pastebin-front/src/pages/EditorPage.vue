@@ -63,7 +63,7 @@ import { useStore } from "@/data/store";
 import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
 import * as api from "@/data/api";
-import { useCopyBtn } from "@/logic";
+import { useCopyBtn } from "@/hooks/useCopyBtn";
 import XButton from "@/components/XButton.vue";
 
 const store = useStore();

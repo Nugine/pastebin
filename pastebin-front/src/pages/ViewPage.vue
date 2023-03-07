@@ -75,7 +75,7 @@ import { computed, onMounted, reactive, watchEffect } from "vue";
 
 import XModal from "@/components/XModal.vue";
 import XButton from "@/components/XButton.vue";
-import { useCopyBtn } from "@/logic";
+import { useCopyBtn } from "@/hooks/useCopyBtn";
 import { useStore } from "@/data/store";
 import * as api from "@/data/api";
 
