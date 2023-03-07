@@ -87,6 +87,28 @@ a:hover {
     box-shadow: none;
 }
 
+.btn-success,
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+    color: white;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:focus {
+    box-shadow: 0 0 3px #00dd00;
+}
+
+.btn-failure,
+.btn-failure:hover,
+.btn-failure:focus,
+.btn-failure:active {
+    color: white;
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
 .main-container {
     width: 100%;
 }

@@ -2,7 +2,9 @@
     <div class="btn-bar">
         <button class="btn" type="button" @click="handleEdit">编辑</button>
         <button class="btn" type="button" @click="handlePreview">预览</button>
-        <button class="btn" type="button" @click="handleCopy">复制</button>
+        <button class="btn" type="button" @click="handleCopy" :class="btnCopyClass[copyStatus]">
+            复制
+        </button>
         <button class="btn" type="button" @click="handlePaste">提交</button>
     </div>
     <form autocomplete="off">
@@ -47,8 +49,11 @@ form {
 </style>
 
 <script setup lang="ts">
-import { LANGS } from "@/data/lang";
+import { ref } from "vue";
+import copyToClipboard from "copy-to-clipboard";
+
 import { useStore } from "@/data/store";
+import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
 
 const store = useStore();
@@ -61,8 +66,18 @@ function handlePreview() {
     // TODO
 }
 
+const btnCopyClass = {
+    none: [],
+    success: ["btn-success"],
+    failure: ["btn-failure"],
+};
+const copyStatus = ref<keyof typeof btnCopyClass>("none");
+
 function handleCopy() {
-    // TODO
+    const result = copyToClipboard(store.record.content);
+    copyStatus.value = result ? "success" : "failure";
+    const resetTime = 600;
+    setTimeout(() => (copyStatus.value = "none"), resetTime);
 }
 
 function handlePaste() {
