@@ -171,14 +171,3 @@ textarea.form-control {
     overflow: auto;
     resize: vertical;
 }
-
-/* debug */
-
-/* div,
-span,
-main,
-footer,
-form,
-svg {
-    border: 1px solid gray;
-} */

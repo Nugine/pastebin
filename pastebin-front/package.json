@@ -17,12 +17,14 @@
         "copy-to-clipboard": "^3.3.3",
         "mande": "^2.0.6",
         "pinia": "^2.0.32",
+        "qrcode": "^1.5.1",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.2.0",
         "@types/node": "^18.14.2",
+        "@types/qrcode": "^1.5.0",
         "@vitejs/plugin-vue": "^4.0.0",
         "@vitejs/plugin-vue-jsx": "^3.0.0",
         "@vue/eslint-config-prettier": "^7.1.0",
