@@ -1,9 +1,9 @@
 <template>
     <div class="btn-bar">
-        <button type="button">Edit</button>
-        <button type="button">Preview</button>
-        <button type="button">Copy</button>
-        <button type="button">Paste!</button>
+        <button class="btn" type="button">Edit</button>
+        <button class="btn" type="button">Preview</button>
+        <button class="btn" type="button">Copy</button>
+        <button class="btn" type="button">Paste!</button>
     </div>
     <form autocomplete="off">
         <div class="form-group">

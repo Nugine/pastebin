@@ -38,11 +38,11 @@ a:hover {
     margin: 1em 0;
 }
 
-.btn-bar button {
+.btn-bar .btn {
     margin: 0 0.2rem;
 }
 
-button {
+.btn {
     display: inline-block;
 
     padding: 0.375rem 0.75rem;
@@ -67,18 +67,24 @@ button {
     user-select: none;
 }
 
-button:hover,
-button:focus,
-button:active {
+.btn:hover,
+.btn:focus,
+.btn:active {
     border-color: #0099ff;
 }
 
-button:hover {
+.btn:hover {
     cursor: pointer;
 }
 
-button:active {
+.btn:active {
     box-shadow: 0 0 4px #0099ff;
+}
+
+.btn:disabled {
+    border-color: #ccc;
+    cursor: default;
+    box-shadow: none;
 }
 
 .main-container {
@@ -142,6 +148,7 @@ textarea.form-control {
 span,
 main,
 footer,
-form {
+form,
+svg {
     border: 1px solid gray;
 } */
