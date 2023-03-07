@@ -14,6 +14,7 @@
     },
     "dependencies": {
         "@icon-park/vue-next": "^1.4.2",
+        "mande": "^2.0.6",
         "pinia": "^2.0.32",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
