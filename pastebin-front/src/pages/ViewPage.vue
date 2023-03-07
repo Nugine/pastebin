@@ -1,32 +1,32 @@
 <template>
     <div class="btn-bar">
-        <button class="btn" type="button" @click="handleEdit">
+        <XButton class="btn" type="button" @click="handleEdit">
             <IconEdit theme="outline" size="16" fill="#333" />
-        </button>
-        <button class="btn" type="button" @click="handleCopy" :class="copyBtnClass">
+        </XButton>
+        <XButton class="btn" type="button" @click="handleCopy" :class="copyBtnClass">
             <IconCopy theme="outline" size="16" fill="#333" />
-        </button>
-        <button class="btn" type="button" @click="qrcodeModal.open()">
+        </XButton>
+        <XButton class="btn" type="button" @click="qrcodeModal.open()">
             <IconQRCode theme="outline" size="16" fill="#333" :stroke-width="5" />
-        </button>
+        </XButton>
         <XModal :show="qrcodeModal.show">
             <div class="modal-header">
                 <span class="modal-title">{{ qrcodeModal.title }}</span>
-                <button class="btn" type="button" @click="qrcodeModal.close()">
+                <XButton class="btn" type="button" @click="qrcodeModal.close()">
                     <IconClose theme="filled" size="16" fill="#333" />
-                </button>
+                </XButton>
             </div>
             <div class="modal-content">
                 <img :src="qrcodeModal.dataUrl" :alt="currentUrl" />
             </div>
         </XModal>
-        <button class="btn" type="button" @click="handleDownload">
+        <XButton class="btn" type="button" @click="handleDownload">
             <IconDownload theme="outline" size="16" fill="#333" />
-        </button>
-        <button class="btn" type="button" disabled>
+        </XButton>
+        <XButton class="btn" type="button" disabled>
             <IconView theme="outline" size="16" fill="#333" :stroke-width="5" />
             {{ store.record.view_count }}
-        </button>
+        </XButton>
     </div>
 </template>
 
@@ -74,6 +74,7 @@ import { useRoute, useRouter } from "vue-router";
 import { computed, onMounted, reactive, watchEffect } from "vue";
 
 import XModal from "@/components/XModal.vue";
+import XButton from "@/components/XButton.vue";
 import { useCopyBtn } from "@/logic";
 import { useStore } from "@/data/store";
 import * as api from "@/data/api";

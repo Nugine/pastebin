@@ -1,19 +1,9 @@
 <template>
     <div class="btn-bar">
-        <button class="btn" type="button" @click="handleEdit" title="切换到编辑界面">编辑</button>
-        <button class="btn" type="button" @click="handlePreview" title="切换到预览界面">
-            预览
-        </button>
-        <button
-            class="btn"
-            type="button"
-            @click="handleCopy"
-            :class="copyBtnClass"
-            title="将内容复制到剪贴板"
-        >
-            复制
-        </button>
-        <button class="btn" type="button" @click="handlePaste" title="保存本条记录">提交</button>
+        <XButton @click="handleEdit" title="切换到编辑界面">编辑</XButton>
+        <XButton @click="handlePreview" title="切换到预览界面">预览</XButton>
+        <XButton @click="handleCopy" title="将内容复制到剪贴板" :class="copyBtnClass">复制</XButton>
+        <XButton @click="handlePaste" title="保存本条记录">提交</XButton>
     </div>
     <form autocomplete="off">
         <div class="form-group">
@@ -74,6 +64,7 @@ import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
 import * as api from "@/data/api";
 import { useCopyBtn } from "@/logic";
+import XButton from "@/components/XButton.vue";
 
 const store = useStore();
 const router = useRouter();
