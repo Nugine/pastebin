@@ -67,13 +67,17 @@ form {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+
 import copyToClipboard from "copy-to-clipboard";
 
 import { useStore } from "@/data/store";
 import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
+import * as api from "@/data/api";
 
 const store = useStore();
+const router = useRouter();
 
 // 表单校验 ----------------------------
 
@@ -92,10 +96,10 @@ function handleEdit() {
 // 预览 ----------------------------
 
 function handlePreview() {
+    formValidated.value = true;
     if (isEditing.value && isValidForm.value) {
         isEditing.value = false;
     }
-    formValidated.value = true;
 }
 
 // 复制 ----------------------------
@@ -116,7 +120,19 @@ function handleCopy() {
 
 // 提交 ----------------------------
 
-function handlePaste() {
-    // TODO
+async function handlePaste() {
+    formValidated.value = true;
+    if (!isValidForm.value) {
+        return;
+    }
+
+    const result = await api.saveRecord(store.record);
+    if (result.ok) {
+        router.push(`/${result.value.key}`);
+    } else {
+        console.error("提交失败", result.error);
+        const msg = result.error?.message ?? "未知错误";
+        setTimeout(() => alert(`提交失败: ${msg}`), 100);
+    }
 }
 </script>
