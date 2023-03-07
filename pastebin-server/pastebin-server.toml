@@ -1,6 +1,6 @@
 [server]
 bind_addr = "localhost:8000"
-host_addr = "localhost:8000"
+host_addr = "localhost"
 
 [security]
 secret_key = "magic"

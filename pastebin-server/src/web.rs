@@ -35,8 +35,8 @@ pub fn build(config: &Config) -> Result<Router> {
         .into_inner();
 
     let router = Router::new()
-        .route("/records/:key", get(find_record))
-        .route("/records", put(save_record))
+        .route("/api/records/:key", get(find_record))
+        .route("/api/records", put(save_record))
         .with_state(Arc::new(svc))
         .layer(middleware)
         .layer(DefaultBodyLimit::max(config.security.max_body_length));
@@ -67,14 +67,14 @@ where
 
 type AppState = State<Arc<PastebinService>>;
 
-/// GET /records/:key
+/// GET /api/records/:key
 ///
 /// -> JSON FindRecordOutput
 pub async fn find_record(State(svc): AppState, Path(key): Path<String>) -> Response {
     json_result(svc.find_record(FindRecordInput { key }).await)
 }
 
-/// PUT /records    
+/// PUT /api/records    
 ///
 /// JSON SaveRecordInput -> JSON SaveRecordOutput
 pub async fn save_record(State(svc): AppState, Json(payload): Json<SaveRecordInput>) -> Response {

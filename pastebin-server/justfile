@@ -1,3 +1,7 @@
 dev:
     cargo clippy
     cargo test
+
+install:
+    cargo install --path .
+
