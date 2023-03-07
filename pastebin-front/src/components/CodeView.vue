@@ -1,5 +1,5 @@
 <template>
-    <div class="line-numbers" ref="contentDiv">
+    <div class="line-numbers" style="width: 100%" ref="contentDiv">
         <pre><code :class="prismClass">{{ props.content }}</code></pre>
     </div>
 </template>

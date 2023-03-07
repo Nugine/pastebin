@@ -3,7 +3,8 @@
         <div class="view-title" v-if="hasTitle">
             {{ props.record.title }}
         </div>
-        <CodeView class="view-content" :lang="props.record.lang" :content="props.record.content" />
+        <MarkdownView v-if="isMarkdown" :content="props.record.content" />
+        <CodeView v-else :lang="props.record.lang" :content="props.record.content" />
     </div>
 </template>
 
@@ -16,20 +17,18 @@
     margin-bottom: 0.5em;
     text-align: center;
 }
-
-.view-content {
-    width: 100%;
-}
 </style>
 
 <script setup lang="ts">
 import type { PastebinRecord } from "@/data/dto";
 import { computed } from "vue";
 import CodeView from "./CodeView.vue";
+import MarkdownView from "./MarkdownView.vue";
 
 const props = defineProps<{
     record: PastebinRecord;
 }>();
 
 const hasTitle = computed(() => props.record.title !== "");
+const isMarkdown = computed(() => props.record.lang === "markdown");
 </script>
