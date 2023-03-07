@@ -1,5 +1,6 @@
 @import "./btn.css";
 @import "./form.css";
+@import "./prismjs.css";
 
 * {
     box-sizing: border-box;

@@ -1,0 +1,6 @@
+/* 修改 prismjs theme "coy" */
+pre[class*="language-"]::after,
+pre[class*="language-"]::before {
+    box-shadow: none !important;
+    display: none;
+}
