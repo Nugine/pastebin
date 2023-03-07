@@ -13,6 +13,7 @@
         "fmt-check": "prettier --check src/ *.ts *.cjs *.json *.html"
     },
     "dependencies": {
+        "@icon-park/vue-next": "^1.4.2",
         "pinia": "^2.0.32",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
