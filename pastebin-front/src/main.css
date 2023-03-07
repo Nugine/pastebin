@@ -100,6 +100,10 @@ a:hover {
     box-shadow: 0 0 3px #00dd00;
 }
 
+.btn-success svg path {
+    stroke: white;
+}
+
 .btn-failure,
 .btn-failure:hover,
 .btn-failure:focus,

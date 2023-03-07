@@ -8,7 +8,7 @@
             class="btn"
             type="button"
             @click="handleCopy"
-            :class="btnCopyClass[copyStatus]"
+            :class="copyBtnClass"
             title="将内容复制到剪贴板"
         >
             复制
@@ -69,12 +69,11 @@ form {
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import copyToClipboard from "copy-to-clipboard";
-
 import { useStore } from "@/data/store";
 import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
 import * as api from "@/data/api";
+import { useCopyBtn } from "@/logic";
 
 const store = useStore();
 const router = useRouter();
@@ -104,19 +103,7 @@ function handlePreview() {
 
 // 复制 ----------------------------
 
-const btnCopyClass = {
-    none: [],
-    success: ["btn-success"],
-    failure: ["btn-failure"],
-};
-const copyStatus = ref<keyof typeof btnCopyClass>("none");
-
-function handleCopy() {
-    const result = copyToClipboard(store.record.content);
-    copyStatus.value = result ? "success" : "failure";
-    const resetTime = 600;
-    setTimeout(() => (copyStatus.value = "none"), resetTime);
-}
+const { copyBtnClass, handleCopy } = useCopyBtn(() => store.record.content);
 
 // 提交 ----------------------------
 
