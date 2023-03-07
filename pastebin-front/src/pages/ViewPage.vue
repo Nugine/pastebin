@@ -28,6 +28,7 @@
             {{ store.record.view_count }}
         </XButton>
     </div>
+    <XView :record="store.record" style="width: 100%; flex-grow: 1" />
 </template>
 
 <style scoped>
@@ -75,6 +76,8 @@ import { computed, onMounted, reactive, watchEffect } from "vue";
 
 import XModal from "@/components/XModal.vue";
 import XButton from "@/components/XButton.vue";
+import XView from "@/components/XView.vue";
+
 import { useCopyBtn } from "@/hooks/useCopyBtn";
 import { useStore } from "@/data/store";
 import * as api from "@/data/api";

@@ -40,7 +40,7 @@
             <span class="invalid-feedback" v-if="showInvalidFeedback">内容不能为空</span>
         </div>
     </form>
-    <XView v-show="!isEditing" :record="store.record" style="width: 100%; flex-grow: 1" />
+    <XView v-if="!isEditing" :record="store.record" style="width: 100%; flex-grow: 1" />
 </template>
 
 <style scoped>
@@ -55,13 +55,14 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
+import XButton from "@/components/XButton.vue";
+import XView from "@/components/XView.vue";
+
 import { useStore } from "@/data/store";
 import { LANGS } from "@/data/lang";
 import { EXPIRATIONS } from "@/data/expiration";
 import * as api from "@/data/api";
 import { useCopyBtn } from "@/hooks/useCopyBtn";
-import XButton from "@/components/XButton.vue";
-import XView from "@/components/XView.vue";
 
 const store = useStore();
 const router = useRouter();
