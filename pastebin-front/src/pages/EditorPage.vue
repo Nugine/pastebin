@@ -5,7 +5,7 @@
         <XButton @click="handleCopy" title="将内容复制到剪贴板" :class="copyBtnClass">复制</XButton>
         <XButton @click="handlePaste" title="保存本条记录">提交</XButton>
     </div>
-    <form autocomplete="off">
+    <form v-show="isEditing" autocomplete="off" style="width: 100%; flex-grow: 1">
         <div class="form-group">
             <label>标题</label>
             <input class="form-control" type="text" v-model="store.record.title" />
@@ -40,14 +40,10 @@
             <span class="invalid-feedback" v-if="showInvalidFeedback">内容不能为空</span>
         </div>
     </form>
+    <XView v-show="!isEditing" :record="store.record" style="width: 100%; flex-grow: 1" />
 </template>
 
 <style scoped>
-form {
-    width: 100%;
-    flex-grow: 1;
-}
-
 .invalid-feedback {
     color: #dc3545;
     font-size: 80%;
@@ -65,6 +61,7 @@ import { EXPIRATIONS } from "@/data/expiration";
 import * as api from "@/data/api";
 import { useCopyBtn } from "@/hooks/useCopyBtn";
 import XButton from "@/components/XButton.vue";
+import XView from "@/components/XView.vue";
 
 const store = useStore();
 const router = useRouter();
