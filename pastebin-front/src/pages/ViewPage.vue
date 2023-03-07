@@ -78,6 +78,8 @@ import XButton from "@/components/XButton.vue";
 import { useCopyBtn } from "@/hooks/useCopyBtn";
 import { useStore } from "@/data/store";
 import * as api from "@/data/api";
+import { downloadFile, isValidFileName } from "@/data/download";
+import { findLangExt } from "@/data/lang";
 
 const store = useStore();
 const router = useRouter();
@@ -85,10 +87,10 @@ const router = useRouter();
 // 载入数据 ----------------------------
 
 const route = useRoute();
+const recordkey = computed(() => route.params.key as string);
 
 watchEffect(async () => {
-    const key = route.params.key as string;
-    const result = await api.findRecord({ key });
+    const result = await api.findRecord({ key: recordkey.value });
     if (result.ok) {
         store.record = result.value;
     } else {
@@ -132,6 +134,10 @@ onMounted(() => {
 // 下载 ----------------------------
 
 function handleDownload() {
-    // TODO
+    const record = store.record;
+    const isValidTitle = isValidFileName(record.title);
+    const fileName = isValidTitle ? record.title : `pastebin-${recordkey.value}`;
+    const fileExt = findLangExt(record.lang) ?? ".txt";
+    downloadFile(fileName + fileExt, record.content);
 }
 </script>
