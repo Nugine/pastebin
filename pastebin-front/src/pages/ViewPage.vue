@@ -1,33 +1,33 @@
 <template>
     <div class="btn-bar">
-        <XButton class="btn" type="button" @click="handleEdit">
+        <XButton class="btn" @click="handleEdit" title="编辑本条记录">
             <IconEdit theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" type="button" @click="handleCopy" :class="copyBtnClass">
+        <XButton class="btn" @click="handleCopy" :class="copyBtnClass" title="将内容复制到剪贴板">
             <IconCopy theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" type="button" @click="qrcodeModal.open()">
+        <XButton class="btn" @click="qrcodeModal.open()" title="显示二维码">
             <IconQRCode theme="outline" size="16" fill="#333" :stroke-width="5" />
         </XButton>
-        <XModal :show="qrcodeModal.show">
-            <div class="modal-header">
-                <span class="modal-title">{{ qrcodeModal.title }}</span>
-                <XButton class="btn" type="button" @click="qrcodeModal.close()">
-                    <IconClose theme="filled" size="16" fill="#333" />
-                </XButton>
-            </div>
-            <div class="modal-content">
-                <img :src="qrcodeModal.dataUrl" :alt="currentUrl" />
-            </div>
-        </XModal>
-        <XButton class="btn" type="button" @click="handleDownload">
+        <XButton class="btn" @click="handleDownload" title="下载本条记录">
             <IconDownload theme="outline" size="16" fill="#333" />
         </XButton>
-        <XButton class="btn" type="button" disabled>
+        <XButton class="btn" disabled title="访问次数">
             <IconView theme="outline" size="16" fill="#333" :stroke-width="5" />
             {{ store.record.view_count }}
         </XButton>
     </div>
+    <XModal :show="qrcodeModal.show">
+        <div class="modal-header">
+            <span class="modal-title">{{ qrcodeModal.title }}</span>
+            <XButton class="btn" @click="qrcodeModal.close()">
+                <IconClose theme="filled" size="16" fill="#333" />
+            </XButton>
+        </div>
+        <div class="modal-content">
+            <img :src="qrcodeModal.dataUrl" :alt="currentUrl" />
+        </div>
+    </XModal>
     <XView :record="store.record" style="width: 100%; flex-grow: 1" />
 </template>
 
