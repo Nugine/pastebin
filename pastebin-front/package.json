@@ -3,9 +3,9 @@
     "version": "0.4.0",
     "private": true,
     "scripts": {
-        "dev": "vite --open",
+        "dev": "vite",
         "build": "run-p fmt-check lint type-check build-only",
-        "preview": "vite preview --open",
+        "preview": "vite preview",
         "build-only": "vite build",
         "type-check": "vue-tsc --noEmit",
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
