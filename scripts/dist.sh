@@ -16,8 +16,13 @@ pushd pastebin-front
 popd
 
 pushd pastebin-server
-    cargo build --release
-    cp target/release/pastebin-server "$BACKEND"
+    if [ -n "$ZIGBUILD" ]; then
+        cargo zigbuild --release --target x86_64-unknown-linux-gnu.2.27
+        cp target/x86_64-unknown-linux-gnu/release/pastebin-server "$BACKEND"
+    else
+        cargo build --release
+        cp target/release/pastebin-server "$BACKEND"
+    fi
     cp pastebin-server.toml "$BACKEND"
 popd
 
