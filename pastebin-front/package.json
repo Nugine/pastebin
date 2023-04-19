@@ -15,7 +15,7 @@
     "dependencies": {
         "@icon-park/vue-next": "^1.4.2",
         "copy-to-clipboard": "^3.3.3",
-        "katex": "^0.16.4",
+        "katex": "^0.16.6",
         "mande": "^2.0.6",
         "markdown-it": "^13.0.1",
         "pinia": "^2.0.32",
