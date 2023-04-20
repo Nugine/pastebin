@@ -1,4 +1,3 @@
-#![feature(is_terminal)]
 #![deny(clippy::all)]
 
 use camino::Utf8Path;
