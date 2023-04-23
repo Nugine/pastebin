@@ -39,7 +39,7 @@ pub fn build(config: &Config) -> Result<Router> {
         .route("/api/records", put(save_record))
         .with_state(Arc::new(svc))
         .layer(middleware)
-        .layer(DefaultBodyLimit::max(config.security.max_body_length));
+        .layer(DefaultBodyLimit::max(config.security.max_http_body_length));
 
     Ok(router)
 }

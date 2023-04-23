@@ -24,10 +24,12 @@ pub struct SecurityConfig {
 
     // TODO: serde with human readable bytes representation
     // <https://docs.rs/bytesize>
-    pub max_body_length: usize,
+    pub max_http_body_length: usize,
 
     pub max_expiration_seconds: u32,
     pub max_qps: u32,
+
+    pub max_title_chars: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

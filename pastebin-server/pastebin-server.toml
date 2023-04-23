@@ -4,9 +4,10 @@ host_addr = "localhost"
 
 [security]
 secret_key = "magic"
-max_body_length = 262144 # 256 KiB
+max_http_body_length = 262144 # 256 KiB
 max_expiration_seconds = 2592123 # 30 days
 max_qps = 1000
+max_title_chars = 64
 
 [redis]
 url = "redis://localhost:6379"

@@ -16,7 +16,7 @@ pub enum PastebinErrorCode {
 
     BadKey = 2001,
     TooLongExpirations = 2002,
-    TooLongContent = 2003,
+    TooLongTitle = 2003,
 
     NotFound = 3001,
 }
@@ -30,7 +30,7 @@ impl PastebinErrorCode {
             Unavailable => StatusCode::SERVICE_UNAVAILABLE,
             BadKey => StatusCode::BAD_REQUEST,
             TooLongExpirations => StatusCode::BAD_REQUEST,
-            TooLongContent => StatusCode::BAD_REQUEST,
+            TooLongTitle => StatusCode::BAD_REQUEST,
             NotFound => StatusCode::NOT_FOUND,
         }
     }

@@ -53,6 +53,10 @@ impl PastebinService {
         &self,
         input: SaveRecordInput,
     ) -> Result<SaveRecordOutput, PastebinError> {
+        if input.title.chars().count() > self.config.security.max_title_chars {
+            return Err(PastebinErrorCode::TooLongTitle.into());
+        }
+
         if input.expiration_seconds > self.config.security.max_expiration_seconds {
             return Err(PastebinErrorCode::TooLongExpirations.into());
         }
