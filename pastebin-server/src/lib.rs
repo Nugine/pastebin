@@ -1,4 +1,5 @@
 #![feature(result_option_inspect)]
+#![forbid(unsafe_code)]
 
 pub mod config;
 pub mod crypto;
