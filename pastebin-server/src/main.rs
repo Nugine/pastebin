@@ -20,32 +20,39 @@ struct Opt {
     pub config: Utf8PathBuf,
 }
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     setup_tracing();
 
     let opt = Opt::parse();
 
     let config = load_config(&opt.config)?;
+    run(config)
+}
+
+#[tokio::main]
+async fn run(config: Config) -> Result<()> {
     let app = pastebin_server::web::build(&config)?;
     serve(app, &config.server.bind_addr).await?;
-
     Ok(())
 }
 
 fn setup_tracing() {
     use tracing_subscriber::filter::{EnvFilter, LevelFilter};
-
-    let enable_color = std::io::stdout().is_terminal();
+    use tracing_subscriber::fmt::time::OffsetTime;
 
     let env_filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .from_env_lossy();
 
+    let enable_color = std::io::stdout().is_terminal();
+
+    let timer = OffsetTime::local_rfc_3339().expect("could not get local time offset");
+
     tracing_subscriber::fmt()
         .pretty()
         .with_env_filter(env_filter)
         .with_ansi(enable_color)
+        .with_timer(timer)
         .init()
 }
 
