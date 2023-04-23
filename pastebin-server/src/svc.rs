@@ -32,12 +32,12 @@ impl PastebinService {
             .validate(&input.key)
             .ok_or(PastebinErrorCode::BadKey)?;
 
-        let opt = self.db.access(&key).await.map_err(|err| {
-            error!(?err);
-            PastebinErrorCode::InternalError
-        })?;
+        let result = self.db.access(&key).await;
 
-        let (record, view_count) = opt.ok_or(PastebinErrorCode::NotFound)?;
+        let (record, view_count) = result
+            .inspect_err(|err| error!(?err))
+            .map_err(|_| PastebinErrorCode::InternalError)?
+            .ok_or(PastebinErrorCode::NotFound)?;
 
         tracing::info!(
             "FIND key = {0}, url = http://{1}/{0} , view_count = {2}",
@@ -69,19 +69,17 @@ impl PastebinService {
 
         let key_gen = || self.crypto.generate();
         let expiration = record.expiration_seconds;
-        let key = self
-            .db
-            .save(key_gen, &record, expiration)
-            .await
-            .map_err(|err| {
-                error!(?err);
-                PastebinErrorCode::InternalError
-            })?;
+        let result = self.db.save(key_gen, &record, expiration).await;
+
+        let key = result
+            .inspect_err(|err| error!(?err))
+            .map_err(|_| PastebinErrorCode::InternalError)?;
 
         tracing::info!(
-            "SAVE key = {0}, url = http://{1}/{0}",
+            "SAVE key = {0}, url = http://{1}/{0} , expiration = {2}",
             key.as_str(),
-            self.config.server.host_addr
+            self.config.server.host_addr,
+            expiration,
         );
 
         Ok(SaveRecordOutput { key })
