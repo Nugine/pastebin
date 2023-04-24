@@ -1,3 +1,4 @@
+use crate::block::BlockRules;
 use crate::config::Config;
 use crate::crypto::Crypto;
 use crate::dto::*;
@@ -13,14 +14,26 @@ pub struct PastebinService {
     config: Config,
     db: RedisStorage,
     crypto: Crypto,
+
+    block_rules: Option<BlockRules>,
 }
 
 impl PastebinService {
     pub fn new(config: &Config) -> Result<Self> {
+        let block_rules = BlockRules::new(config)?;
+
         let db = RedisStorage::new(&config.redis)?;
+
         let crypto = Crypto::new(&config.security.secret_key);
+
         let config = config.clone();
-        Ok(Self { config, db, crypto })
+
+        Ok(Self {
+            config,
+            db,
+            crypto,
+            block_rules,
+        })
     }
 
     pub async fn find_record(
@@ -59,6 +72,14 @@ impl PastebinService {
 
         if input.expiration_seconds > self.config.security.max_expiration_seconds {
             return Err(PastebinErrorCode::TooLongExpirations.into());
+        }
+
+        if let Some(block_rules) = self.block_rules.as_ref() {
+            if block_rules.is_match(&input) {
+                let key = self.crypto.generate();
+                tracing::info!("BLOCKED key = {}", key.as_str());
+                return Ok(SaveRecordOutput { key });
+            }
         }
 
         let now = UnixTimestamp::now().expect("must be after 1970");

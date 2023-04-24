@@ -30,6 +30,8 @@ pub struct SecurityConfig {
     pub max_qps: u32,
 
     pub max_title_chars: usize,
+
+    pub block_rules: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
