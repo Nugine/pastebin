@@ -24,6 +24,7 @@ use axum::Router;
 
 use anyhow::Result;
 use serde::Serialize;
+use tracing::debug;
 use tracing::error;
 use tracing::warn;
 
@@ -58,7 +59,16 @@ async fn handle_error(err: BoxError) -> Response {
     error_response(PastebinErrorCode::InternalError.into())
 }
 
+#[tracing::instrument(skip(req, next))]
 async fn axum_middleware<B>(req: Request<B>, next: Next<B>) -> Response {
+    {
+        let x_forwarded_for = req.headers().get("x-forwarded-for");
+        let x_real_ip = req.headers().get("x-real-ip");
+        if x_forwarded_for.is_some() || x_real_ip.is_some() {
+            debug!(?x_forwarded_for, ?x_real_ip)
+        }
+    }
+
     let res = next.run(req).await;
 
     // hide error details from serde_json
@@ -91,6 +101,7 @@ type AppState = State<Arc<PastebinService>>;
 /// GET /api/records/:key
 ///
 /// -> JSON FindRecordOutput
+#[tracing::instrument(skip(svc))]
 pub async fn find_record(State(svc): AppState, Path(key): Path<String>) -> Response {
     json_result(svc.find_record(FindRecordInput { key }).await)
 }
@@ -98,6 +109,7 @@ pub async fn find_record(State(svc): AppState, Path(key): Path<String>) -> Respo
 /// PUT /api/records    
 ///
 /// JSON SaveRecordInput -> JSON SaveRecordOutput
+#[tracing::instrument(skip(svc, payload))]
 pub async fn save_record(State(svc): AppState, Json(payload): Json<SaveRecordInput>) -> Response {
     json_result(svc.save_record(payload).await)
 }

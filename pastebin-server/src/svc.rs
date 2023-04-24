@@ -14,6 +14,7 @@ use std::sync::Arc;
 use anyhow::Result;
 use tokio::spawn;
 use tracing::error;
+use tracing::info;
 
 pub struct PastebinService {
     config: Config,
@@ -65,7 +66,7 @@ impl PastebinService {
             .map_err(|_| PastebinErrorCode::InternalError)?
             .ok_or(PastebinErrorCode::NotFound)?;
 
-        tracing::info!(
+        info!(
             "FIND key = {0}, url = http://{1}/{0} , view_count = {2}",
             key.as_str(),
             self.config.server.host_addr,
@@ -90,7 +91,7 @@ impl PastebinService {
         if let Some(block_rules) = self.block_rules.as_ref() {
             if block_rules.is_match(&input) {
                 let key = self.crypto.generate();
-                tracing::info!("BLOCKED key = {}", key.as_str());
+                info!("BLOCKED key = {}", key.as_str());
                 return Ok(SaveRecordOutput { key });
             }
         }
@@ -122,7 +123,7 @@ impl PastebinService {
             anti_bot.watch_deactivate(&key, on_fail).await;
         }
 
-        tracing::info!(
+        info!(
             "SAVE key = {0}, url = http://{1}/{0} , expiration = {2}",
             key.as_str(),
             self.config.server.host_addr,
@@ -137,7 +138,7 @@ fn deactivate_new_key(db: Arc<RedisStorage>, key: Key) {
     drop(spawn(async move {
         let result = db.delete(&key).await;
         match result {
-            Ok(true) => tracing::info!("ANTIBOT DEL key = {}", key.as_str()),
+            Ok(true) => info!("ANTIBOT DEL key = {}", key.as_str()),
             Ok(false) => {}
             Err(err) => error!(?err),
         }
