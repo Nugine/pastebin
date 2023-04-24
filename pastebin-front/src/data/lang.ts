@@ -1,4 +1,4 @@
-import { LANGUAGES } from "../../prismjs.custom";
+import { LANGUAGES } from "../../prismjs-custom";
 
 export interface Lang {
     value: string;

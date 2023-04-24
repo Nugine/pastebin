@@ -1,4 +1,4 @@
-export const LANGUAGES = [
+export const LANGUAGES: [string, string, string][] = [
     ["markdown", "Markdown", ".md"],
     ["html", "HTML", ".html"],
     ["css", "CSS", ".css"],
