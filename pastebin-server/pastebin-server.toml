@@ -9,6 +9,7 @@ max_expiration_seconds = 2592123 # 30 days
 max_qps = 1000
 max_title_chars = 64
 block_rules = []
+anti_bot = true
 
 [redis]
 url = "redis://localhost:6379"

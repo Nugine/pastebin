@@ -100,4 +100,12 @@ impl RedisStorage {
         let record: Record = serde_json::from_str(&json).inspect_err(|err| error!(?err))?;
         Ok(Some((record, view)))
     }
+
+    pub async fn delete(&self, key: &Key) -> Result<bool> {
+        let mut conn = self.get_conn().await?;
+        let redis_key = self.concat_key(key);
+
+        let deleted: bool = conn.del(redis_key).await.inspect_err(|err| error!(?err))?;
+        Ok(deleted)
+    }
 }

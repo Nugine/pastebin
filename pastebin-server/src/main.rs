@@ -1,7 +1,6 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all)]
 
-use camino::Utf8Path;
 use pastebin_server::config::Config;
 
 use std::io::IsTerminal;
@@ -10,6 +9,7 @@ use std::net::TcpListener;
 use anyhow::Context;
 use anyhow::Result;
 use axum::Router;
+use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use clap::Parser;
 use tracing::info;

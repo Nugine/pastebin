@@ -1,28 +1,36 @@
-use crate::block::BlockRules;
+use crate::anti_bot::AntiBot;
+use crate::block_rules::BlockRules;
 use crate::config::Config;
 use crate::crypto::Crypto;
+use crate::crypto::Key;
 use crate::dto::*;
 use crate::error::PastebinError;
 use crate::error::PastebinErrorCode;
 use crate::redis::RedisStorage;
 use crate::time::UnixTimestamp;
 
+use std::sync::Arc;
+
 use anyhow::Result;
+use tokio::spawn;
 use tracing::error;
 
 pub struct PastebinService {
     config: Config,
-    db: RedisStorage,
+    db: Arc<RedisStorage>,
     crypto: Crypto,
 
     block_rules: Option<BlockRules>,
+    anti_bot: Option<AntiBot>,
 }
 
 impl PastebinService {
     pub fn new(config: &Config) -> Result<Self> {
         let block_rules = BlockRules::new(config)?;
 
-        let db = RedisStorage::new(&config.redis)?;
+        let anti_bot = AntiBot::new(config)?;
+
+        let db = Arc::new(RedisStorage::new(&config.redis)?);
 
         let crypto = Crypto::new(&config.security.secret_key);
 
@@ -33,6 +41,7 @@ impl PastebinService {
             db,
             crypto,
             block_rules,
+            anti_bot,
         })
     }
 
@@ -44,6 +53,10 @@ impl PastebinService {
             .crypto
             .validate(&input.key)
             .ok_or(PastebinErrorCode::BadKey)?;
+
+        if let Some(anti_bot) = self.anti_bot.as_ref() {
+            anti_bot.cancel_deactivate(&key).await;
+        }
 
         let result = self.db.access(&key).await;
 
@@ -100,6 +113,15 @@ impl PastebinService {
             .inspect_err(|err| error!(?err))
             .map_err(|_| PastebinErrorCode::InternalError)?;
 
+        if let Some(anti_bot) = self.anti_bot.as_ref() {
+            let on_fail = {
+                let db = self.db.clone();
+                let key = key.clone();
+                || deactivate_new_key(db, key)
+            };
+            anti_bot.watch_deactivate(&key, on_fail).await;
+        }
+
         tracing::info!(
             "SAVE key = {0}, url = http://{1}/{0} , expiration = {2}",
             key.as_str(),
@@ -109,4 +131,15 @@ impl PastebinService {
 
         Ok(SaveRecordOutput { key })
     }
+}
+
+fn deactivate_new_key(db: Arc<RedisStorage>, key: Key) {
+    drop(spawn(async move {
+        let result = db.delete(&key).await;
+        match result {
+            Ok(true) => tracing::info!("ANTIBOT DEL key = {}", key.as_str()),
+            Ok(false) => {}
+            Err(err) => error!(?err),
+        }
+    }))
 }
