@@ -18,7 +18,7 @@ use tracing::info;
 
 pub struct PastebinService {
     config: Config,
-    db: Arc<RedisStorage>,
+    db: RedisStorage,
     crypto: Crypto,
 
     block_rules: Option<BlockRules>,
@@ -31,7 +31,7 @@ impl PastebinService {
 
         let anti_bot = AntiBot::new(config)?;
 
-        let db = Arc::new(RedisStorage::new(&config.redis)?);
+        let db = RedisStorage::new(&config.redis)?;
 
         let crypto = Crypto::new(&config.security.secret_key);
 
@@ -47,7 +47,7 @@ impl PastebinService {
     }
 
     pub async fn find_record(
-        &self,
+        self: &Arc<Self>,
         input: FindRecordInput,
     ) -> Result<FindRecordOutput, PastebinError> {
         let key = self
@@ -72,7 +72,7 @@ impl PastebinService {
     }
 
     pub async fn save_record(
-        &self,
+        self: &Arc<Self>,
         input: SaveRecordInput,
     ) -> Result<SaveRecordOutput, PastebinError> {
         if input.title.chars().count() > self.config.security.max_title_chars {
@@ -111,9 +111,9 @@ impl PastebinService {
 
         if let Some(anti_bot) = self.anti_bot.as_ref() {
             let on_fail = {
-                let db = self.db.clone();
+                let svc = self.clone();
                 let key = key.clone();
-                || deactivate_new_key(db, key)
+                || deactivate_new_key(svc, key)
             };
             anti_bot.watch_deactivate(&key, on_fail).await;
         }
@@ -124,9 +124,9 @@ impl PastebinService {
     }
 }
 
-fn deactivate_new_key(db: Arc<RedisStorage>, key: Key) {
+fn deactivate_new_key(svc: Arc<PastebinService>, key: Key) {
     drop(spawn(async move {
-        let result = db.delete(&key).await;
+        let result = svc.db.delete(&key).await;
         match result {
             Ok(true) => info!("ANTIBOT DEL key = {}", key.as_str()),
             Ok(false) => {}
