@@ -11,6 +11,9 @@ use axum::error_handling::HandleErrorLayer;
 use axum::extract::DefaultBodyLimit;
 use axum::extract::Path;
 use axum::extract::State;
+use axum::http::Request;
+use axum::http::StatusCode;
+use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use axum::routing::get;
@@ -27,7 +30,7 @@ use tracing::warn;
 pub fn build(config: &Config) -> Result<Router> {
     let svc = PastebinService::new(config)?;
 
-    let middleware = tower::ServiceBuilder::new()
+    let tower_middleware = tower::ServiceBuilder::new()
         .layer(HandleErrorLayer::new(handle_error))
         .buffer(4096)
         .load_shed()
@@ -38,7 +41,8 @@ pub fn build(config: &Config) -> Result<Router> {
         .route("/api/records/:key", get(find_record))
         .route("/api/records", put(save_record))
         .with_state(Arc::new(svc))
-        .layer(middleware)
+        .layer(axum::middleware::from_fn(axum_middleware))
+        .layer(tower_middleware)
         .layer(DefaultBodyLimit::max(config.security.max_http_body_length));
 
     Ok(router)
@@ -52,6 +56,17 @@ async fn handle_error(err: BoxError) -> Response {
 
     error!(?err);
     error_response(PastebinErrorCode::InternalError.into())
+}
+
+async fn axum_middleware<B>(req: Request<B>, next: Next<B>) -> Response {
+    let res = next.run(req).await;
+
+    // hide error details from serde_json
+    if res.status() == StatusCode::UNPROCESSABLE_ENTITY {
+        return StatusCode::UNPROCESSABLE_ENTITY.into_response();
+    }
+
+    res
 }
 
 fn json_result<T>(ret: Result<T, PastebinError>) -> Response
