@@ -22,4 +22,5 @@ tokio = { version = "1.27.0", features = ["full"] }
 toml = "0.7.3"
 tower = { version = "0.4.13", features = ["limit", "buffer", "load-shed"] }
 tracing = "0.1.37"
+tracing-futures = "0.2.5"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter", "time", "local-time"] }

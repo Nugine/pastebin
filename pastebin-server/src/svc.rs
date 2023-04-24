@@ -66,12 +66,7 @@ impl PastebinService {
             .map_err(|_| PastebinErrorCode::InternalError)?
             .ok_or(PastebinErrorCode::NotFound)?;
 
-        info!(
-            "FIND key = {0}, url = http://{1}/{0} , view_count = {2}",
-            key.as_str(),
-            self.config.server.host_addr,
-            view_count,
-        );
+        info!("FIND key = {}, view_count = {}", key.as_str(), view_count);
 
         Ok(FindRecordOutput { record, view_count })
     }
@@ -123,12 +118,7 @@ impl PastebinService {
             anti_bot.watch_deactivate(&key, on_fail).await;
         }
 
-        info!(
-            "SAVE key = {0}, url = http://{1}/{0} , expiration = {2}",
-            key.as_str(),
-            self.config.server.host_addr,
-            expiration,
-        );
+        info!("SAVE key = {}, expiration = {}", key.as_str(), expiration);
 
         Ok(SaveRecordOutput { key })
     }

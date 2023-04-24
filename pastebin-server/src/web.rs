@@ -24,12 +24,13 @@ use axum::Router;
 
 use anyhow::Result;
 use serde::Serialize;
-use tracing::debug;
 use tracing::error;
 use tracing::warn;
+use tracing_futures::Instrument;
 
 pub fn build(config: &Config) -> Result<Router> {
     let svc = PastebinService::new(config)?;
+    let state = Arc::new(svc);
 
     let tower_middleware = tower::ServiceBuilder::new()
         .layer(HandleErrorLayer::new(handle_error))
@@ -41,8 +42,8 @@ pub fn build(config: &Config) -> Result<Router> {
     let router = Router::new()
         .route("/api/records/:key", get(find_record))
         .route("/api/records", put(save_record))
-        .with_state(Arc::new(svc))
-        .layer(axum::middleware::from_fn(axum_middleware))
+        .with_state(state.clone())
+        .layer(axum::middleware::from_fn_with_state(state, axum_middleware))
         .layer(tower_middleware)
         .layer(DefaultBodyLimit::max(config.security.max_http_body_length));
 
@@ -59,17 +60,20 @@ async fn handle_error(err: BoxError) -> Response {
     error_response(PastebinErrorCode::InternalError.into())
 }
 
-#[tracing::instrument(skip(req, next))]
-async fn axum_middleware<B>(req: Request<B>, next: Next<B>) -> Response {
-    {
-        let x_forwarded_for = req.headers().get("x-forwarded-for");
-        let x_real_ip = req.headers().get("x-real-ip");
-        if x_forwarded_for.is_some() || x_real_ip.is_some() {
-            debug!(?x_forwarded_for, ?x_real_ip)
-        }
-    }
+async fn axum_middleware<B>(State(svc): AppState, req: Request<B>, next: Next<B>) -> Response {
+    let _svc = svc;
 
-    let res = next.run(req).await;
+    let x_forwarded_for = req.headers().get("x-forwarded-for");
+    let x_real_ip = req.headers().get("x-real-ip");
+    let span = tracing::debug_span!(
+        "axum_middleware",
+        method = %req.method(),
+        path = %req.uri().path(),
+        ?x_forwarded_for,
+        ?x_real_ip
+    );
+
+    let res = next.run(req).instrument(span).await;
 
     // hide error details from serde_json
     if res.status() == StatusCode::UNPROCESSABLE_ENTITY {
