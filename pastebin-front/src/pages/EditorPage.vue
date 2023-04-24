@@ -102,7 +102,15 @@ async function handlePaste() {
         return;
     }
 
-    const result = await api.saveRecord(store.record);
+    // 不要提交多余的字段
+    // 这里会有 typescript 的型变
+    const result = await api.saveRecord({
+        title: store.record.title,
+        lang: store.record.lang,
+        expiration_seconds: store.record.expiration_seconds,
+        content: store.record.content,
+    });
+
     if (result.ok) {
         router.push(`/${result.value.key}`);
     } else {
