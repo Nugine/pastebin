@@ -7,7 +7,9 @@ import type {
 } from "./dto";
 import { mande, type MandeError } from "mande";
 
-const records = mande("/api/records");
+const records = mande("/api/records", {
+    mode: "same-origin",
+});
 
 export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
