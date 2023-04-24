@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 type SharedString = bytestring::ByteString;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Record {
     pub title: SharedString,
     pub lang: SharedString,
@@ -15,6 +16,7 @@ pub struct Record {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SaveRecordInput {
     pub title: SharedString,
     pub lang: SharedString,
@@ -23,16 +25,19 @@ pub struct SaveRecordInput {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SaveRecordOutput {
     pub key: Key,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FindRecordInput {
     pub key: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FindRecordOutput {
     #[serde(flatten)]
     pub record: Record,
