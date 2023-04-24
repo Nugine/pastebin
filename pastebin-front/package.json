@@ -29,7 +29,7 @@
         "@rushstack/eslint-patch": "^1.2.0",
         "@types/katex": "^0.16.0",
         "@types/markdown-it": "^12.2.3",
-        "@types/node": "^18.15.12",
+        "@types/node": "^18.16.0",
         "@types/prismjs": "^1.26.0",
         "@types/qrcode": "^1.5.0",
         "@vitejs/plugin-vue": "^4.1.0",
