@@ -22,7 +22,7 @@
         "prismjs": "^1.29.0",
         "qrcode": "^1.5.1",
         "vite-plugin-prismjs": "^0.0.8",
-        "vue": "^3.2.47",
+        "vue": "^3.3.2",
         "vue-router": "^4.2.0"
     },
     "devDependencies": {
