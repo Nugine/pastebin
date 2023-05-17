@@ -23,7 +23,7 @@
         "qrcode": "^1.5.1",
         "vite-plugin-prismjs": "^0.0.8",
         "vue": "^3.2.47",
-        "vue-router": "^4.1.6"
+        "vue-router": "^4.2.0"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.2.0",
