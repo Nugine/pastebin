@@ -1,7 +1,7 @@
 <template>
     <Teleport to="body" v-if="mountTeleport">
-        <div class="fade backdrop" :class="{ show: show }"></div>
-        <div class="fade modal" :class="{ show: show }">
+        <div class="fade backdrop" :class="{ show: showModal }"></div>
+        <div class="fade modal" :class="{ show: showModal }">
             <div class="modal-dialog">
                 <slot />
             </div>
@@ -73,19 +73,19 @@ import { ref, watchPostEffect } from "vue";
 const props = defineProps<{ show: boolean }>();
 
 const mountTeleport = ref(props.show);
-const show = ref(false);
+const showModal = ref(false);
 
 watchPostEffect((onCleanup) => {
     if (props.show) {
         mountTeleport.value = true;
-        show.value = false;
+        showModal.value = false;
 
         // 挂载 Teleport 后，显示 Modal，触发 CSS 动画
-        const timer = setTimeout(() => (show.value = true), 60);
+        const timer = setTimeout(() => (showModal.value = true), 60);
         onCleanup(() => clearTimeout(timer));
     } else {
         // 触发 CSS 动画
-        show.value = false;
+        showModal.value = false;
 
         // 当动画结束后，卸载 Teleport
         const timer = setTimeout(() => (mountTeleport.value = false), 400);
