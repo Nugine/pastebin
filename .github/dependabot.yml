@@ -12,6 +12,10 @@ updates:
     ignore:
     - dependency-name: "*"
       update-types: ["version-update:semver-patch"]
+    groups:
+      backend:
+        patterns:
+          - "*"
   - package-ecosystem: "npm"
     directory: "/pastebin-front"
     schedule:
@@ -19,3 +23,7 @@ updates:
     ignore:
     - dependency-name: "*"
       update-types: ["version-update:semver-patch"]
+    groups:
+      frontend:
+        patterns:
+          - "*"
