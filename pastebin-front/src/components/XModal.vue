@@ -72,6 +72,7 @@ import { ref, watchPostEffect } from "vue";
 
 const props = defineProps<{ show: boolean }>();
 
+// eslint-disable-next-line vue/no-setup-props-destructure
 const mountTeleport = ref(props.show);
 const showModal = ref(false);
 
