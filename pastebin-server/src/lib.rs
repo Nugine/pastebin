@@ -1,4 +1,3 @@
-#![feature(result_option_inspect)]
 #![forbid(unsafe_code)]
 
 mod anti_bot;
