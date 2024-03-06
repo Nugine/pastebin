@@ -4,7 +4,6 @@
 use pastebin_server::config::Config;
 
 use std::io::IsTerminal;
-use std::net::TcpListener;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -12,6 +11,7 @@ use axum::Router;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use clap::Parser;
+use tokio::net::TcpListener;
 use tracing::info;
 
 #[derive(clap::Parser)]
@@ -62,13 +62,11 @@ fn load_config(path: &Utf8Path) -> Result<Config> {
 }
 
 async fn serve(app: Router, addr: &str) -> Result<()> {
-    let listener = TcpListener::bind(addr)?;
-    let server = axum::Server::from_tcp(listener)?
-        .serve(app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal());
-
+    let listener = TcpListener::bind(addr).await?;
     info!("listening on {}", addr);
-    server.await?;
+    axum::serve(listener, app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
     Ok(())
 }
 

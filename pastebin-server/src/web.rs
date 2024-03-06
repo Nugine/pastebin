@@ -10,8 +10,8 @@ use std::time::Duration;
 use axum::error_handling::HandleErrorLayer;
 use axum::extract::DefaultBodyLimit;
 use axum::extract::Path;
+use axum::extract::Request;
 use axum::extract::State;
-use axum::http::Request;
 use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::IntoResponse;
@@ -60,7 +60,7 @@ async fn handle_error(err: BoxError) -> Response {
     error_response(PastebinErrorCode::InternalError.into())
 }
 
-async fn axum_middleware<B>(State(svc): AppState, req: Request<B>, next: Next<B>) -> Response {
+async fn axum_middleware(State(svc): AppState, req: Request, next: Next) -> Response {
     let _svc = svc;
 
     let x_forwarded_for = req.headers().get("x-forwarded-for");
