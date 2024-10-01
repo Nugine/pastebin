@@ -12,15 +12,15 @@ camino = "1.1.4"
 clap = { version = "4.4.0", features = ["derive"] }
 mobc-redis = "0.8.0"
 rand = "0.8.5"
-regex = "1.9.1"
+regex = "1.11.0"
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.99"
 serde_repr = "0.1.12"
 short-crypt = "1.0.27"
 thiserror = "1.0.40"
-tokio = { version = "1.39.2", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 toml = "0.8.0"
-tower = { version = "0.4.13", features = ["limit", "buffer", "load-shed"] }
+tower = { version = "0.5.0", features = ["limit", "buffer", "load-shed"] }
 tracing = "0.1.37"
 tracing-futures = "0.2.5"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "time", "local-time"] }
