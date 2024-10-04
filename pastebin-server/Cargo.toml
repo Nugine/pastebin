@@ -20,7 +20,7 @@ short-crypt = "1.0.28"
 thiserror = "1.0.64"
 tokio = { version = "1.40.0", features = ["full"] }
 toml = "0.8.19"
-tower = { version = "0.4.13", features = ["limit", "buffer", "load-shed"] }
+tower = { version = "0.5.1", features = ["limit", "buffer", "load-shed"] }
 tracing = "0.1.40"
 tracing-futures = "0.2.5"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "time", "local-time"] }
