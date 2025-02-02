@@ -1,5 +1,4 @@
 use bytestring::ByteString;
-use rand::Rng;
 use serde::{Deserialize, Serialize};
 use short_crypt::ShortCrypt;
 
@@ -21,7 +20,7 @@ impl Crypto {
     }
 
     pub fn generate(&self) -> Key {
-        let rand_bytes: [u8; 4] = rand::thread_rng().gen();
+        let rand_bytes: [u8; 4] = rand::random();
 
         let mut s: String = self.0.encrypt_to_qr_code_alphanumeric(&rand_bytes);
         s.make_ascii_lowercase();
