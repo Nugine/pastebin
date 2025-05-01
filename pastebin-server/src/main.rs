@@ -58,7 +58,7 @@ fn setup_tracing() {
 }
 
 fn load_config(path: &Utf8Path) -> Result<Config> {
-    Config::from_toml(path).with_context(|| format!("Failed to read config from {:?}", path))
+    Config::from_toml(path).with_context(|| format!("Failed to read config from {path:?}"))
 }
 
 async fn serve(app: Router, addr: &str) -> Result<()> {
