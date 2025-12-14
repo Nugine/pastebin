@@ -4,7 +4,7 @@ use crate::dto::Record;
 
 use mobc_redis::mobc;
 use mobc_redis::redis;
-use redis::aio::Connection;
+use redis::aio::MultiplexedConnection;
 use redis::AsyncCommands;
 
 use anyhow::Result;
@@ -18,7 +18,7 @@ pub struct RedisStorage {
 const VIEW_COUNT_FIELD: &str = "view_count";
 const JSON_FIELD: &str = "json";
 
-async fn exists(conn: &mut Connection, redis_key: &str) -> Result<bool> {
+async fn exists(conn: &mut MultiplexedConnection, redis_key: &str) -> Result<bool> {
     let exists: bool = conn
         .exists(redis_key)
         .await
@@ -73,8 +73,8 @@ impl RedisStorage {
             .atomic()
             .hset(&redis_key, VIEW_COUNT_FIELD, 0_u64)
             .hset(&redis_key, JSON_FIELD, &*json)
-            .expire(&redis_key, expiration_seconds as usize)
-            .query_async::<Connection, ()>(&mut conn)
+            .expire(&redis_key, expiration_seconds as i64)
+            .query_async::<()>(&mut *conn)
             .await
             .inspect_err(|err| error!(?err))?;
 
@@ -89,11 +89,11 @@ impl RedisStorage {
             return Ok(None);
         }
 
-        let (view, json) = redis::pipe()
+        let (view, json): (u64, String) = redis::pipe()
             .atomic()
             .hincr(&redis_key, VIEW_COUNT_FIELD, 1_u64)
             .hget(&redis_key, JSON_FIELD)
-            .query_async::<Connection, (u64, String)>(&mut conn)
+            .query_async(&mut *conn)
             .await
             .inspect_err(|err| error!(?err))?;
 
