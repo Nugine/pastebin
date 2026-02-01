@@ -23,13 +23,13 @@
         "qrcode": "^1.5.3",
         "vite-plugin-prismjs": "^0.0.8",
         "vue": "^3.4.3",
-        "vue-router": "^4.6.3"
+        "vue-router": "^5.0.1"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.15.0",
         "@types/katex": "^0.16.2",
         "@types/markdown-it": "^14.1.2",
-        "@types/node": "^25.0.3",
+        "@types/node": "^25.2.0",
         "@types/prismjs": "^1.26.0",
         "@types/qrcode": "^1.5.1",
         "@vitejs/plugin-vue": "^6.0.2",
@@ -38,9 +38,9 @@
         "@vue/eslint-config-typescript": "^14.6.0",
         "@vue/tsconfig": "^0.7.0",
         "eslint": "^9.39.1",
-        "eslint-plugin-vue": "^10.6.2",
+        "eslint-plugin-vue": "^10.7.0",
         "npm-run-all": "^4.1.5",
-        "prettier": "^3.7.3",
+        "prettier": "^3.8.1",
         "typescript": "5.7.2",
         "vite": "^7.3.0",
         "vue-tsc": "^3.2.1"
