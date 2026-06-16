@@ -9,8 +9,8 @@ export function useCopyBtn(content: () => string) {
     };
     const copyStatus = ref<keyof typeof btnClasses>("none");
 
-    function handleCopy() {
-        const result = copyToClipboard(content());
+    async function handleCopy() {
+        const result = await copyToClipboard(content());
         copyStatus.value = result ? "success" : "failure";
         const resetTime = 600;
         setTimeout(() => (copyStatus.value = "none"), resetTime);
